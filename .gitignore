@@ -1,0 +1,6 @@
+*.json
+.MW-api-keys
+ezget
+
+# binary output of go build
+define
