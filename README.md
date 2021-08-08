@@ -17,6 +17,10 @@ define [word]
 define --more [word]
 ```
 
+## Install
+
+`TODO`
+
 ## Features 
 
 * short, quick CLI lookup
