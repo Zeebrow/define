@@ -46,7 +46,6 @@ func DoArgs() (cliargs CLIArgs) {
 
 	flag.BoolVar(&cliargs.more, "m", false, more_help)
 	flag.BoolVar(&cliargs.nsfw, "x", false, nsfw_help)
-	flag.StringVar(&cliargs.store, "w", "", "Save output to file")
 	flag.BoolVar(&cliargs.synonyms, "s", false, "Save output to file")
 	flag.BoolVar(&cliargs.antonyms, "a", false, "Save output to file")
 	flag.BoolVar(&cliargs.debug, "debug", false, "Print debug output")
