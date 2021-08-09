@@ -57,6 +57,7 @@ export MW_THESAURUS_API_KEY=ABC
 
 ### long-term
 
+* client-server model
 * `--more` syntax highlighting
 * other dictionary integrations: slang, programming, pop culture, etc.
 * local caching of content looked up in the past
