@@ -11,10 +11,21 @@ Working enough
 ## Usage
 
 ```
-define [word]
-
-# long output opened similar to $MANPAGER
-define --more [word]
+zeebrow@zeebrow-pc:define(master)$ ./define 
+Specify a word to look up!
+Usage of define:
+  -a	Save output to file
+  -debug
+    	Print debug output
+  -dict-api-key string
+    	Overwrite any configuration of MW_DICTIONARY_API_KEY
+  -m	Print more detailed definitions
+  -s	Save output to file
+  -thes-api-key string
+    	Overwrite any configuration of MW_THESAURUS_API_KEY
+  -w string
+    	Save output to file
+  -x	Print potentially offensive definitions
 ```
 
 ## Install
@@ -28,9 +39,13 @@ go build -ldflags "-X config.MWDictionaryApiKey=XZY -X config.MWThesaurusApiKey"
 ```
 -X config.MWDictionaryApiKey=XZY
 -X config.MWThesaurusApiKey=ABC
+```
+### Environments
 
 ```
-
+export MW_DICTIONARY_API_KEY=XYZ
+export MW_THESAURUS_API_KEY=ABC
+```
 
 ## Features 
 
@@ -75,13 +90,8 @@ zeebrow@zeebrow-pc:define(master)$ ./ezget tool | jq '.[0].def[0].sseq[2]'
 
 ### Why it's hard
 
-Arrays of arrays of arrays. JSON objects are represented as `["key": {}]` arrays. Everything is an array. To the point where it makes me think Python would be a much better choice for this, overall:
+Arrays of arrays of arrays. JSON objects are represented as `["key": {}]` arrays. Everything is an array. To the point where it makes me think Python would be a much better choice for some things.
 
-They have a duck-typed api? I should use a duck-typed program to interpret it.
+Go is super fast, and I need to learn it. Python isn't fast, but it's flexiblity could go a long way for specific parts here.
 
-Go is super fast, and I need to learn it - but it's verbose. Python isn't fast, but it's flexible enough to get me somewhere maintainable.
-
-I think there's a way to get the best of both worlds.
-
-The basic usage will be handled by go, anything more and go will pipe the json to a python script.
 
