@@ -15,6 +15,8 @@ var MWThesaurusApiKey string
 
 func (cfg *GlobalConfiguration) SetConfig() {
 
+	// 5th hard-coded variables
+	cfg.ConfigFilepath = "/user/zeebrow/.local/etc/define.conf"
 	// 4th injected build variables
 	cfg.MWDictionaryApiKey = MWDictionaryApiKey
 	cfg.MWThesaurusApiKey = MWThesaurusApiKey

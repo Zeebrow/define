@@ -26,32 +26,6 @@ type BothResps struct {
 	badresponse  BadResponse
 }
 
-// This exists because I can't work with the raw api response
-// from Merriam-Webster. It's an array of X.
-// response = 200, regardless of whether word exists in dictionary,
-// so we cram response into structs and see where it doesn't fit.
-func (sus *MWRawAPIResp) judge() (resps *BothResps) {
-	resps = new(BothResps)
-	resps.isGood = false
-	err := json.Unmarshal(sus.Resp, &resps.badresponse)
-	if err != nil {
-		// fmt.Printf("Could not unmarshal raw api response into badresponse (Good thing). %s\n", err)
-		err = json.Unmarshal(sus.Resp, &resps.badresponse)
-		if err != nil {
-			// fmt.Printf("Could not unmarshal raw api response into badresponse (Good thing). %s\n", err)
-			err = json.Unmarshal(sus.Resp, &resps.goodresponse.Entries)
-			if err != nil {
-				fmt.Printf("WTF error - Could not unmarshal into 'empty array'. %v\n", err)
-				fmt.Printf("You definitely didn't see this coming. uhhh.... exiting!\n")
-				os.Exit(1)
-			}
-			// fmt.Printf("Good response.\n")
-			resps.isGood = true
-		}
-	}
-	return
-}
-
 type BadResponse struct {
 	Suggestions []string
 }
@@ -131,6 +105,32 @@ type MWMetadata struct {
 	// Each stem string is a valid search term that should match this entry.
 	Stem      map[string]string
 	Offensive bool
+}
+
+// This exists because I can't work with the raw api response
+// from Merriam-Webster. It's an array of X.
+// response = 200, regardless of whether word exists in dictionary,
+// so we cram response into structs and see where it doesn't fit.
+func (sus *MWRawAPIResp) judge() (resps *BothResps) {
+	resps = new(BothResps)
+	resps.isGood = false
+	err := json.Unmarshal(sus.Resp, &resps.badresponse)
+	if err != nil {
+		// fmt.Printf("Could not unmarshal raw api response into badresponse (Good thing). %s\n", err)
+		err = json.Unmarshal(sus.Resp, &resps.badresponse)
+		if err != nil {
+			// fmt.Printf("Could not unmarshal raw api response into badresponse (Good thing). %s\n", err)
+			err = json.Unmarshal(sus.Resp, &resps.goodresponse.Entries)
+			if err != nil {
+				fmt.Printf("WTF error - Could not unmarshal into 'empty array'. %v\n", err)
+				fmt.Printf("You definitely didn't see this coming. uhhh.... exiting!\n")
+				os.Exit(1)
+			}
+			// fmt.Printf("Good response.\n")
+			resps.isGood = true
+		}
+	}
+	return
 }
 
 func get_dictionary_key() (key string) {
