@@ -2,11 +2,15 @@ package main
 
 import "os"
 
-// Global so other functions can use it
-// This is set in do_args.go, maybe it should be there instead?
+// Globals
+// do_args.go
 var Debug bool
 
+// config.go
+var GlobalConfig GlobalConfiguration
+
 func main() {
+	GlobalConfig.SetConfig()
 	var args = DoArgs()
 
 	if args.more {

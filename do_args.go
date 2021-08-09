@@ -10,10 +10,14 @@ type CLIArgs struct {
 	// nsfw = include MW offensive: true
 	nsfw bool
 	// more = use Merriam-Webster
-	more  bool
-	store string
-	debug bool
-	word  string
+	more       bool
+	store      string
+	debug      bool
+	synonyms   bool
+	antonyms   bool
+	dictApiKey string
+	thesApiKey string
+	word       string
 }
 
 // var Usage = func() {
@@ -41,11 +45,14 @@ func DoArgs() (cliargs CLIArgs) {
 	)
 
 	flag.BoolVar(&cliargs.more, "m", false, more_help)
-	// flag.BoolVar(&cliargs.more, "more", false, more_help)
 	flag.BoolVar(&cliargs.nsfw, "x", false, nsfw_help)
-	// flag.BoolVar(&cliargs.nsfw, "nsfw", false, nsfw_help)
-	flag.StringVar(&cliargs.store, "s", "", "Save output to file")
+	flag.StringVar(&cliargs.store, "w", "", "Save output to file")
+	flag.BoolVar(&cliargs.synonyms, "s", false, "Save output to file")
+	flag.BoolVar(&cliargs.antonyms, "a", false, "Save output to file")
 	flag.BoolVar(&cliargs.debug, "debug", false, "Print debug output")
+	flag.StringVar(&cliargs.store, "w", "", "Save output to file")
+	flag.StringVar(&cliargs.dictApiKey, "dict-api-key", "", "Overwrite any configuration of MW_DICTIONARY_API_KEY")
+	flag.StringVar(&cliargs.thesApiKey, "thes-api-key", "", "Overwrite any configuration of MW_THESAURUS_API_KEY")
 	flag.Parse()
 	if cliargs.debug {
 		Debug = true

@@ -19,7 +19,18 @@ define --more [word]
 
 ## Install
 
-`TODO`
+```
+go build -ldflags "-X config.MWDictionaryApiKey=XZY -X config.MWThesaurusApiKey"
+```
+
+### Build args
+
+```
+-X config.MWDictionaryApiKey=XZY
+-X config.MWThesaurusApiKey=ABC
+
+```
+
 
 ## Features 
 
