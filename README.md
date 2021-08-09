@@ -40,7 +40,7 @@ go build -ldflags "-X config.MWDictionaryApiKey=XZY -X config.MWThesaurusApiKey"
 -X config.MWDictionaryApiKey=XZY
 -X config.MWThesaurusApiKey=ABC
 ```
-### Environments
+### Environmentals
 
 ```
 export MW_DICTIONARY_API_KEY=XYZ
@@ -59,7 +59,6 @@ export MW_THESAURUS_API_KEY=ABC
 
 * `--more` syntax highlighting
 * other dictionary integrations: slang, programming, pop culture, etc.
-* link to more info when unable to find match
 * local caching of content looked up in the past
 
 ### short-term
