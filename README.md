@@ -84,6 +84,7 @@ zeebrow@zeebrow-pc:define(master)$ ./ezget tool | jq '.[0].def[0].sseq[2]'
 ## Why it sucks
 
 * you need your own Merriam-Webster api key to get access to `-m` better definitions
+* output format :pukeemoji:
 * ~you can't configure where the api keys are (must be in same dir as executable)~
 * ~I'm not worthy to parse the responses from Merriam-Webster~
 
