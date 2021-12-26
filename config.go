@@ -16,12 +16,13 @@ var MWThesaurusApiKey string
 func (cfg *GlobalConfiguration) SetConfig() {
 
 	// 5th hard-coded variables
-	cfg.ConfigFilepath = "/user/zeebrow/.local/etc/define.conf"
+	cfg.ConfigFilepath = "/home/zeebrow/.local/etc/define.conf"
 	// 4th injected build variables
 	cfg.MWDictionaryApiKey = MWDictionaryApiKey
 	cfg.MWThesaurusApiKey = MWThesaurusApiKey
 
 	// 3rd config file default
+  // @tonotdo
 
 	// 2nd is Environment
 	cfg.MWDictionaryApiKey = os.Getenv("MW_DICTIONARY_API_KEY")
@@ -31,6 +32,7 @@ func (cfg *GlobalConfiguration) SetConfig() {
 	// 1st CLI args take precedence
 	// might not be a thing, idk
 
+  // @todo, n00b
 	// How to iterate thru struct and check for nil string?
 	// v := reflect.ValueOf(cfg)
 	// for i := 0; i < v.NumField(); i++ {
