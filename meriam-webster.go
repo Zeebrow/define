@@ -13,11 +13,11 @@ import (
 )
 
 type MWRawAPIResp struct {
-	// Known issue:
 	// This needs to handle both good AND bad responses
 	// All responses will have status 200.
 	// not sure how to implement UnmarshalJSON interface, if that's best.
 	Resp []byte
+	
 }
 
 type BothResps struct {
@@ -134,11 +134,6 @@ func (sus *MWRawAPIResp) judge() (resps *BothResps) {
 }
 
 func get_dictionary_key() (key string) {
-	// fi,err := os.UserHomeDir()
-	// if err != nil {
-	// 	fmt.Printf("could not get user home directory %s, exiting!\n", )
-	// }
-	// f := fi + ""
 	f := ".MW-api-keys"
 	r, err := ioutil.ReadFile(f)
 	if err != nil {
@@ -190,10 +185,6 @@ func (gr *GoodResponse) doForEntries() {
 	fmt.Println()
 }
 
-func (s *Sense) printSenseStuff() {
-	fmt.Printf("%v\n", s)
-}
-
 func (gr *GoodResponse) PrintRawMWResponse() {
 	fmt.Printf("%v", gr.Entries)
 }
@@ -205,7 +196,7 @@ func GetMW(headword string, nsfw bool) {
 	resp, err := http.Get(fetch)
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Failed to get data from '%s': '%v'", fetch, err)
 		os.Exit(1)
 	}
 
@@ -216,20 +207,15 @@ func GetMW(headword string, nsfw bool) {
 		os.Exit(4)
 	}
 
-	// fmt.Printf("%s", raw_resp)
 	var r MWRawAPIResp
 	r.Resp = raw_resp
 	br := r.judge()
-	// fmt.Println("__________________________________________________________________________________")
 	if br.isGood {
 		fmt.Println(headword + ":")
-		// br.printShortdefs()
 		br.goodresponse.doForEntries()
 		return
 	} else {
 		fmt.Printf("Bad response: \n")
 		fmt.Printf("%v\n", br.badresponse.Suggestions)
 	}
-	// fmt.Printf("%s\n", raw_resp)
-	// fmt.Println("__________________________________________________________________________________")
 }

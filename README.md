@@ -11,7 +11,7 @@ Working enough
 ## Usage
 
 ```
-zeebrow@zeebrow-pc:define(master)$ ./define 
+$ ./define 
 Specify a word to look up!
 Usage of define:
   -a	Save output to file
