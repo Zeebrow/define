@@ -10,14 +10,15 @@ type CLIArgs struct {
 	// nsfw = include MW offensive: true
 	nsfw bool
 	// more = use Merriam-Webster
-	more       bool
-	store      string
-	debug      bool
-	synonyms   bool
-	antonyms   bool
-	dictApiKey string
-	thesApiKey string
-	word       string
+	more        bool
+	store       string
+	debug       bool
+	synonyms    bool
+	antonyms    bool
+	dictApiKey  string
+	thesApiKey  string
+	cfgFilepath string
+	word        string
 }
 
 // var Usage = func() {
@@ -33,6 +34,7 @@ func printDebug(c *CLIArgs) {
 	fmt.Printf("debug: %v\n", c.debug)
 	fmt.Printf("store: %v\n", c.store)
 	fmt.Printf("word to define: %v\n", c.word)
+	fmt.Printf("get config from file: %v\n", c.cfgFilepath)
 	fmt.Printf("NArg: %d\n", flag.NArg())
 	fmt.Printf("NFlag: %d\n", flag.NFlag())
 }
@@ -40,8 +42,9 @@ func printDebug(c *CLIArgs) {
 func DoArgs() (cliargs CLIArgs) {
 
 	const (
-		more_help = "Print more detailed definitions"
-		nsfw_help = "Print potentially offensive definitions"
+		more_help       = "Print more detailed definitions"
+		nsfw_help       = "Print potentially offensive definitions"
+		cfgFilepathHelp = "override location to config file (default is .MW-api-keys in home directory)"
 	)
 
 	flag.BoolVar(&cliargs.more, "m", false, more_help)
@@ -52,6 +55,8 @@ func DoArgs() (cliargs CLIArgs) {
 	flag.StringVar(&cliargs.store, "w", "", "Save output to file")
 	flag.StringVar(&cliargs.dictApiKey, "dict-api-key", "", "Overwrite any configuration of MW_DICTIONARY_API_KEY")
 	flag.StringVar(&cliargs.thesApiKey, "thes-api-key", "", "Overwrite any configuration of MW_THESAURUS_API_KEY")
+	flag.StringVar(&cliargs.cfgFilepath, "f", "", cfgFilepathHelp)
+
 	flag.Parse()
 	if cliargs.debug {
 		Debug = true

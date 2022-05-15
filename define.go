@@ -1,6 +1,8 @@
 package main
 
-import "os"
+import (
+	"os"
+)
 
 // Globals
 // do_args.go
@@ -10,11 +12,12 @@ var Debug bool
 var GlobalConfig GlobalConfiguration
 
 func main() {
-	GlobalConfig.SetConfig()
+
 	var args = DoArgs()
+	GlobalConfig.SetConfig(args)
 
 	if args.more {
-		GetMW(args.word, args.nsfw)
+		GetMW(args.word, args.nsfw, args.cfgFilepath)
 	} else {
 		DevPrintMeanings(args.word, args.nsfw)
 	}

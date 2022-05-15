@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type GlobalConfiguration struct {
@@ -13,7 +15,17 @@ type GlobalConfiguration struct {
 var MWDictionaryApiKey string
 var MWThesaurusApiKey string
 
-func (cfg *GlobalConfiguration) SetConfig() {
+func GetDefaultFilepath() string {
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("Could not get user home directory... searching current directory for config")
+		return ".MW-api-keys"
+	} else {
+		return fmt.Sprintf("%s", filepath.Join(dirname, ".MW-api-keys"))
+	}
+}
+
+func (cfg *GlobalConfiguration) SetConfig(cliArgs CLIArgs) {
 
 	// 5th hard-coded variables
 	cfg.ConfigFilepath = "/home/zeebrow/.local/etc/define.conf"
@@ -22,17 +34,28 @@ func (cfg *GlobalConfiguration) SetConfig() {
 	cfg.MWThesaurusApiKey = MWThesaurusApiKey
 
 	// 3rd config file default
-  // @tonotdo
+
+	// @tonotdo
 
 	// 2nd is Environment
-	cfg.MWDictionaryApiKey = os.Getenv("MW_DICTIONARY_API_KEY")
-	cfg.MWThesaurusApiKey = os.Getenv("MW_THESAURUS_API_KEY")
-	cfg.ConfigFilepath = "asdf"
+	if os.Getenv("MW_DICTIONARY_API_KEY") != "" {
+		cfg.MWDictionaryApiKey = os.Getenv("MW_DICTIONARY_API_KEY")
+	}
+	if os.Getenv("MW_THESAURUS_API_KEY") != "" {
+		cfg.MWThesaurusApiKey = os.Getenv("MW_THESAURUS_API_KEY")
+	}
 
 	// 1st CLI args take precedence
 	// might not be a thing, idk
+	if cliArgs.cfgFilepath == "" {
+		cfg.ConfigFilepath = GetDefaultFilepath()
+	} else {
+		//cfg.ConfigFilepath = filepath
+		//fmt.Printf("Setting cfg filepath from cli arg: %s\n", cliArgs.cfgFilepath)
+		cfg.ConfigFilepath = cliArgs.cfgFilepath
+	}
 
-  // @todo, n00b
+	// @todo, n00b
 	// How to iterate thru struct and check for nil string?
 	// v := reflect.ValueOf(cfg)
 	// for i := 0; i < v.NumField(); i++ {

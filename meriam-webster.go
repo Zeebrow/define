@@ -17,7 +17,6 @@ type MWRawAPIResp struct {
 	// All responses will have status 200.
 	// not sure how to implement UnmarshalJSON interface, if that's best.
 	Resp []byte
-	
 }
 
 type BothResps struct {
@@ -133,13 +132,12 @@ func (sus *MWRawAPIResp) judge() (resps *BothResps) {
 	return
 }
 
-func get_dictionary_key() (key string) {
-	f := ".MW-api-keys"
+func get_dictionary_key(f string) (key string) {
+	//	f := ".MW-api-keys"
 	r, err := ioutil.ReadFile(f)
 	if err != nil {
 		fmt.Printf("Could open API keys file: %s. Error: %v", f, err)
-		// TODO: learn better exit strategy
-		os.Exit(2)
+		return ""
 	}
 
 	// Do I really have to unmarshall here?
@@ -153,7 +151,7 @@ func get_dictionary_key() (key string) {
 	if err != nil {
 		fmt.Printf("Could not get dictionary API keys from file: %s. Error: %v", f, err)
 		// TODO: learn better exit strategy
-		os.Exit(3)
+		os.Exit(1)
 	}
 	key = ks.Dictionary
 	return
@@ -189,9 +187,9 @@ func (gr *GoodResponse) PrintRawMWResponse() {
 	fmt.Printf("%v", gr.Entries)
 }
 
-func GetMW(headword string, nsfw bool) {
+func GetMW(headword string, nsfw bool, cfgFilepath string) {
 	url := "https://www.dictionaryapi.com/api/v3/references/collegiate/json/"
-	key_dict := get_dictionary_key()
+	key_dict := get_dictionary_key(cfgFilepath)
 	fetch := fmt.Sprintf("%s/%s?key=%s", url, headword, key_dict)
 	resp, err := http.Get(fetch)
 
