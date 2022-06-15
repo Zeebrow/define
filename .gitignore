@@ -3,6 +3,7 @@ tmp
 *.json
 .MW-api-keys
 ezget
+build
 
 # binary output of go build
 define
