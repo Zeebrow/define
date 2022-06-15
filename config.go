@@ -7,6 +7,7 @@ import (
 )
 
 type GlobalConfiguration struct {
+	Version            string
 	MWDictionaryApiKey string
 	MWThesaurusApiKey  string
 	ConfigFilepath     string
@@ -14,6 +15,7 @@ type GlobalConfiguration struct {
 
 var MWDictionaryApiKey string
 var MWThesaurusApiKey string
+var Version = "dev"
 
 func GetDefaultFilepath() string {
 	dirname, err := os.UserHomeDir()
@@ -25,8 +27,12 @@ func GetDefaultFilepath() string {
 	}
 }
 
-func (cfg *GlobalConfiguration) SetConfig(cliArgs CLIArgs) {
+func (cfg *GlobalConfiguration) getVersion() string {
+	return cfg.Version
+}
 
+func (cfg *GlobalConfiguration) SetConfig(cliArgs CLIArgs) {
+	cfg.Version = Version
 	// 5th hard-coded variables
 	cfg.ConfigFilepath = "/home/zeebrow/.local/etc/define.conf"
 	// 4th injected build variables

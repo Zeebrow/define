@@ -37,8 +37,8 @@ go build -ldflags "-X config.MWDictionaryApiKey=XZY -X config.MWThesaurusApiKey"
 ### Build args
 
 ```
--X config.MWDictionaryApiKey=XZY
--X config.MWThesaurusApiKey=ABC
+-X main.MWDictionaryApiKey=XZY
+-X main.MWThesaurusApiKey=ABC
 ```
 ### Environmentals
 

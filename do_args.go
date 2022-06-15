@@ -19,6 +19,7 @@ type CLIArgs struct {
 	thesApiKey  string
 	cfgFilepath string
 	word        string
+	version     bool
 }
 
 // var Usage = func() {
@@ -28,7 +29,6 @@ type CLIArgs struct {
 // }
 
 func printDebug(c *CLIArgs) {
-
 	fmt.Printf("m: %v\n", c.more)
 	fmt.Printf("NSFW?: %v\n", c.nsfw)
 	fmt.Printf("debug: %v\n", c.debug)
@@ -37,6 +37,7 @@ func printDebug(c *CLIArgs) {
 	fmt.Printf("get config from file: %v\n", c.cfgFilepath)
 	fmt.Printf("NArg: %d\n", flag.NArg())
 	fmt.Printf("NFlag: %d\n", flag.NFlag())
+	fmt.Printf("version: %v\n", c.version)
 }
 
 func DoArgs() (cliargs CLIArgs) {
@@ -45,6 +46,7 @@ func DoArgs() (cliargs CLIArgs) {
 		more_help       = "Print more detailed definitions"
 		nsfw_help       = "Print potentially offensive definitions"
 		cfgFilepathHelp = "override location to config file (default is .MW-api-keys in home directory)"
+		versionHelp     = "print the version and exit."
 	)
 
 	flag.BoolVar(&cliargs.more, "m", false, more_help)
@@ -56,11 +58,15 @@ func DoArgs() (cliargs CLIArgs) {
 	flag.StringVar(&cliargs.dictApiKey, "dict-api-key", "", "Overwrite any configuration of MW_DICTIONARY_API_KEY")
 	flag.StringVar(&cliargs.thesApiKey, "thes-api-key", "", "Overwrite any configuration of MW_THESAURUS_API_KEY")
 	flag.StringVar(&cliargs.cfgFilepath, "f", "", cfgFilepathHelp)
-
+	flag.BoolVar(&cliargs.version, "version", false, versionHelp)
 	flag.Parse()
 	if cliargs.debug {
 		Debug = true
 		printDebug(&cliargs)
+	}
+	if cliargs.version {
+		fmt.Println(Version)
+		os.Exit(0)
 	}
 	if flag.NArg() < 1 {
 		fmt.Println("Specify a word to look up!")
