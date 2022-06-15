@@ -27,10 +27,6 @@ func GetDefaultFilepath() string {
 	}
 }
 
-func (cfg *GlobalConfiguration) getVersion() string {
-	return cfg.Version
-}
-
 func (cfg *GlobalConfiguration) SetConfig(cliArgs CLIArgs) {
 	cfg.Version = Version
 	// 5th hard-coded variables

@@ -66,7 +66,7 @@ func DoArgs() (cliargs CLIArgs) {
 	}
 	if cliargs.version {
 		fmt.Println(Version)
-		os.Exit(0)
+		os.Exit(1)
 	}
 	if flag.NArg() < 1 {
 		fmt.Println("Specify a word to look up!")
