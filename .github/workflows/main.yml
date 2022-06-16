@@ -19,6 +19,9 @@ jobs:
     - name: Build
       run: make build-linux-amd64
 
+    - name: Get version
+      run: build/define* -version
+
   build-windows-amd64:
     runs-on: windows-latest
     steps:

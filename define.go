@@ -1,24 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"os"
 )
-
-// Globals
-// do_args.go
-var Debug bool
-
-// config.go
-var GlobalConfig GlobalConfiguration
 
 func main() {
 	var args = DoArgs()
 	GlobalConfig.SetConfig(args)
+	fmt.Printf("mw dictionary key: %s\nmw thesaurus key: %s\n", GlobalConfig.MWDictionaryApiKey, GlobalConfig.MWThesaurusApiKey)
+	GlobalConfig.printDebug()
 
 	if args.more {
-		GetMW(args.word, args.nsfw, args.cfgFilepath)
+		GetMW(args.word, args.cfgFilepath)
 	} else {
-		DevPrintMeanings(args.word, args.nsfw)
+		DevPrintMeanings(args.word)
 	}
 
 	os.Exit(0)

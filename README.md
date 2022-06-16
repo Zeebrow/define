@@ -43,8 +43,18 @@ go build -ldflags "-X config.MWDictionaryApiKey=XZY -X config.MWThesaurusApiKey"
 ### Environmentals
 
 ```
+export MW_CONFIG_FILEPATH=/path/to/api/keys/dict
 export MW_DICTIONARY_API_KEY=XYZ
 export MW_THESAURUS_API_KEY=ABC
+```
+
+`MW_CONFIG_FILEPATH` should be a json file structured like this:
+```json
+{
+    "dictionary": "dictionary api key",
+    "thesaurus": "thesaurus api key"
+}
+~        
 ```
 
 ## Features 

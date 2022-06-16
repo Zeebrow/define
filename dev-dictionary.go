@@ -106,7 +106,7 @@ func devAllDefns(d Defn) {
 	}
 }
 
-func DevPrintMeanings(word string, nsfw bool) {
+func DevPrintMeanings(word string) {
 	resp := devGetDef(word)
 	uline := strings.Repeat("-", len(resp.Word))
 	fmt.Printf("\n%s\n", resp.Word)

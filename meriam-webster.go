@@ -132,36 +132,6 @@ func (sus *MWRawAPIResp) judge() (resps *BothResps) {
 	return
 }
 
-func get_dictionary_key(f string) (key string) {
-	//	f := ".MW-api-keys"
-	r, err := ioutil.ReadFile(f)
-	if err != nil {
-		fmt.Printf("Could open API keys file: %s. Error: %v", f, err)
-		return ""
-	}
-
-	// Do I really have to unmarshall here?
-	// Gut says this is not the best way to do this
-	type keys struct {
-		Dictionary string `json:"dictionary"`
-		Thesaurus  string `json:"thesaurus,omitempty"`
-	}
-	var ks keys
-	err = json.Unmarshal(r, &ks)
-	if err != nil {
-		fmt.Printf("Could not get dictionary API keys from file: %s. Error: %v", f, err)
-		// TODO: learn better exit strategy
-		os.Exit(1)
-	}
-	key = ks.Dictionary
-	return
-}
-
-// type byPos struct {
-// 	pos         string
-// 	definitions []string
-// }
-
 func (e *Entry) printShortdefs() {
 	//fmt.Printf("\tFound %d shortdefs for %s (%s).\n", len(e.Shortdef), e.Meta.Id, e.Fl)
 	fmt.Printf("\t%s\n\t%s\n", e.Fl, strings.Repeat("-", len(e.Fl)))
@@ -172,7 +142,7 @@ func (e *Entry) printShortdefs() {
 }
 
 func (gr *GoodResponse) doForEntries() {
-	if Debug {
+	if GlobalConfig.Debug {
 		ne := len(gr.Entries)
 		fmt.Printf("DEBUG: Number of entries: %d\n\n", ne)
 	}
@@ -187,11 +157,14 @@ func (gr *GoodResponse) PrintRawMWResponse() {
 	fmt.Printf("%v", gr.Entries)
 }
 
-func GetMW(headword string, nsfw bool, cfgFilepath string) {
+func GetMW(headword string, cfgFilepath string) {
 	url := "https://www.dictionaryapi.com/api/v3/references/collegiate/json/"
-	key_dict := get_dictionary_key(cfgFilepath)
-	fetch := fmt.Sprintf("%s/%s?key=%s", url, headword, key_dict)
+	fetch := fmt.Sprintf("%s/%s?key=%s", url, headword, GlobalConfig.MWDictionaryApiKey)
 	resp, err := http.Get(fetch)
+	if GlobalConfig.Debug {
+		fmt.Printf("url: %s\n", fetch)
+		fmt.Println(resp)
+	}
 
 	if err != nil {
 		fmt.Printf("Failed to get data from '%s': '%v'", fetch, err)
