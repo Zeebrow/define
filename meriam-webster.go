@@ -75,8 +75,9 @@ type Etymology struct {
 // Collection (list) of headwords and their definitions
 type Sense struct {
 	// index of a particular sense in a list of senses.
-	SenseNumber string   `json:"sn"`
-	SLS         []string `json:"sls,omitempty"`
+	SenseNumber string `json:"sn"`
+	//Status Label https://dictionaryapi.com/products/json#sec-2.sls
+	SLS []string `json:"sls,omitempty"`
 
 	// Defining text. Meat and potatoes.
 	DT DefiningText `json:"dt"`

@@ -11,21 +11,54 @@ Working enough
 ## Usage
 
 ```
-$ ./define 
-Specify a word to look up!
+$ define -h
 Usage of define:
-  -a	Save output to file
   -debug
     	Print debug output
   -dict-api-key string
     	Overwrite any configuration of MW_DICTIONARY_API_KEY
-  -m	Print more detailed definitions
-  -s	Save output to file
+  -f string
+    	override location to config file (default is .MW-api-keys in home directory) (default "/home/zeebrow/.define.conf")
+  -q	Use an alternative dictionary with more reliable api responses
+  -stdin
+    	Read a json from stdin instead of calling api
   -thes-api-key string
     	Overwrite any configuration of MW_THESAURUS_API_KEY
-  -w string
-    	Save output to file
-  -x	Print potentially offensive definitions
+  -version
+    	print the version and exit.
+```
+
+### Example Output
+
+```
+$ define monster
+monster:
+	noun (monster:1)
+	----
+	(1/3)	an animal of strange or terrifying shape
+	(2/3)	one unusually large for its kind
+	(3/3)	an animal or plant of abnormal form or structure
+
+	adjective (monster:2)
+	---------
+	(1/1)	enormous or impressive especially in size, extent, or numbers
+
+	noun (Gila monster)
+	----
+	(1/1)	a large, stout, venomous lizard (Heloderma suspectum) that has rough, bumpy, black and orange, pinkish, or yellowish skin, a thick tail, and venom glands in the lower lip and that is found especially in arid regions of the southwestern U.S. and northwestern Mexico
+
+	noun (green-eyed monster)
+	----
+	(1/1)	jealousy imagined as a monster that attacks people —usually used with the
+
+	noun (Loch Ness Monster)
+	----
+	(1/1)	a large, long-necked creature that has long been reported to exist in the waters of Loch Ness in Scotland
+
+	noun (party monster)
+	----
+	(1/1)	a person known for frequent often wild partying : party animal
+
 ```
 
 ## Install
