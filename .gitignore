@@ -4,6 +4,8 @@ tmp
 .MW-api-keys
 ezget
 build
+dist
+ERRORS.md
 
 # binary output of go build
 define

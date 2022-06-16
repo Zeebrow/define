@@ -25,8 +25,10 @@ install-zeebrow:
 	go install .
 	go build \
 		-ldflags " \
-		-X 'main.Version=$(GIT_HASH_LONG)' \
+		-X 'main.Version=dev-$(GIT_HASH)' \
 		-X 'main.BuildDate=$(BUILD_DATE)' \
+		-X 'main.CommitHash=$(GIT_HASH_LONG)' \
+		-X 'main.ProgramName=$(PROG_NAME)' \
 		" \
 		-o build/$(PROG_NAME) .
 	cp build/$(PROG_NAME) $(HOME)/.local/bin/scripts
@@ -39,6 +41,18 @@ build-dev:
 		" \
 		-o build/define-$(GIT_HASH) .
 
+build-with-keys:
+	go install .
+	go build -ldflags " \
+		-X 'main.Version=dev-$(GIT_HASH)' \
+		-X 'main.BuildDate=$(BUILD_DATE)' \
+		-X 'main.CommitHash=$(GIT_HASH_LONG)' \
+		-X 'main.ProgramName=$(PROG_NAME)' \
+		-X 'main.MWDictionaryApiKey=$(MW_DICT_API_KEY)' \
+		-X 'main.MWThesaurusApiKey=$(MW_THES_API_KEY)' \
+		" \
+		-o build/define .
+
 build:
 	go install .
 	go build -ldflags " \
@@ -46,7 +60,6 @@ build:
 		-X 'main.BuildDate=$(BUILD_DATE)' \
 		-X 'main.CommitHash=$(GIT_HASH_LONG)' \
 		-X 'main.ProgramName=$(PROG_NAME)' \
-		-X 'main.ProgInfo.Test=WHOOPIE' \
 		" \
 		-o build/define .
 
@@ -58,6 +71,11 @@ package-deb: build
 	echo "$$DEBIAN_CONTROL" > dist/$(PROG_NAME)/DEBIAN/control
 	dpkg-deb --build dist/$(PROG_NAME)
 	cp dist/*.deb build/
+
+remove-deb:
+	sudo apt -y remove $(PROG_NAME) 
+reinstall-deb: clean remove-deb package-deb
+	sudo apt install ./build/$(PROG_NAME).deb
 
 clean:
 	rm -rf dist/

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -38,7 +40,7 @@ type Entry struct {
 	Meta MWMetadata
 	// Shortdef is probably all we need
 	Shortdef []string
-	Def      []Sense
+	Def      []Sense `json:"def"`
 }
 
 // General datastructure based on Merriam-Webster's API documentation
@@ -64,7 +66,6 @@ type GeneralSense struct {
 	// Challenge: Unmarshall to SenseObject,
 	// based on GeneralSense.Type
 	// I THINK this has merit...
-	// But again, fuck this golang BS for something so easy in Python
 	SenseObject map[string]interface{}
 }
 
@@ -74,8 +75,8 @@ type Etymology struct {
 // Collection (list) of headwords and their definitions
 type Sense struct {
 	// index of a particular sense in a list of senses.
-	SenseNumber string `json:"sn"`
-	SLS         string `json:"sls,omitempty"`
+	SenseNumber string   `json:"sn"`
+	SLS         []string `json:"sls,omitempty"`
 
 	// Defining text. Meat and potatoes.
 	DT DefiningText `json:"dt"`
@@ -125,7 +126,6 @@ func (sus *MWRawAPIResp) judge() (resps *BothResps) {
 				fmt.Printf("You definitely didn't see this coming. uhhh.... exiting!\n")
 				os.Exit(1)
 			}
-			// fmt.Printf("Good response.\n")
 			resps.isGood = true
 		}
 	}
@@ -133,8 +133,7 @@ func (sus *MWRawAPIResp) judge() (resps *BothResps) {
 }
 
 func (e *Entry) printShortdefs() {
-	//fmt.Printf("\tFound %d shortdefs for %s (%s).\n", len(e.Shortdef), e.Meta.Id, e.Fl)
-	fmt.Printf("\t%s\n\t%s\n", e.Fl, strings.Repeat("-", len(e.Fl)))
+	fmt.Printf("\t%s (%s)\n\t%s\n", e.Fl, e.Meta.Id, strings.Repeat("-", len(e.Fl)))
 	for i, v := range e.Shortdef {
 		fmt.Printf("\t(%d/%d)\t%s\n", i+1, len(e.Shortdef), v)
 	}
@@ -157,36 +156,47 @@ func (gr *GoodResponse) PrintRawMWResponse() {
 	fmt.Printf("%v", gr.Entries)
 }
 
-func GetMW(headword string, cfgFilepath string) {
-	url := "https://www.dictionaryapi.com/api/v3/references/collegiate/json/"
-	fetch := fmt.Sprintf("%s/%s?key=%s", url, headword, GlobalConfig.MWDictionaryApiKey)
-	resp, err := http.Get(fetch)
-	if GlobalConfig.Debug {
-		fmt.Printf("url: %s\n", fetch)
-		fmt.Println(resp)
-	}
+func GetMW(headword string, stdin bool) {
+	var t []byte
+	var err error
+	var url string
+	if stdin {
+		reader := bufio.NewReader(os.Stdin)
+		t, err = reader.ReadBytes('\n')
+		if err != io.EOF && err != nil {
+			fmt.Println(err)
+		}
+	} else {
+		url = fmt.Sprintf("https://www.dictionaryapi.com/api/v3/references/collegiate/json/%s?key=%s", headword, GlobalConfig.MWDictionaryApiKey)
+		resp, err := http.Get(url)
 
-	if err != nil {
-		fmt.Printf("Failed to get data from '%s': '%v'", fetch, err)
-		os.Exit(1)
-	}
+		if err != nil {
+			fmt.Printf("Failed to get data from '%s': '%v'", url, err)
+			os.Exit(1)
+		}
 
-	raw_resp, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Printf("Error reading raw response from MW server: %v\n", err)
-		fmt.Printf("Server responded: %d\n", resp.StatusCode)
-		os.Exit(4)
+		t, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Printf("Error reading raw response from MW server: %v\n", err)
+			fmt.Printf("Server responded: %d\n", resp.StatusCode)
+			os.Exit(4)
+		}
 	}
 
 	var r MWRawAPIResp
-	r.Resp = raw_resp
+	r.Resp = t
 	br := r.judge()
 	if br.isGood {
 		fmt.Println(headword + ":")
 		br.goodresponse.doForEntries()
-		return
 	} else {
 		fmt.Printf("Bad response: \n")
 		fmt.Printf("%v\n", br.badresponse.Suggestions)
 	}
+
+	if GlobalConfig.Debug {
+		fmt.Printf("url: %s\n", url)
+		// fmt.Println(rawResp)
+	}
+	return
 }

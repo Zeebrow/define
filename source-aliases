@@ -1,0 +1,108 @@
+function def(){
+  go run . "$1"
+}
+
+function defstdin(){
+  go run . -stdin "$1"
+}
+
+function defdebug(){
+  go run . -debug "$1"
+}
+
+function defcar() {
+cat <<EOF | tr -d ' ' | tr -d '\n' | defstdin car
+[
+  {
+    "meta": {
+      "id": "bar car",
+      "uuid": "deb2be15-952b-4c0c-92cf-42ca022d046d",
+      "sort": "020063500",
+      "src": "collegiate",
+      "section": "alpha",
+      "stems": [
+        "bar car",
+        "bar cars"
+      ],
+      "offensive": false
+    },
+    "hwi": {
+      "hw": "bar car"
+    },
+    "fl": "noun",
+    "def": [
+      {
+        "sseq": [
+          [
+            [
+              "sense",
+              {
+                "dt": [
+                  [
+                    "text",
+                    "{bc}{sx|club car||}"
+                  ]
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    ],
+    "date": "1933",
+    "shortdef": [
+      "club car"
+    ]
+  }
+]
+EOF
+}
+
+function defcar2() {
+cat <<EOF | tr -d ' ' | tr -d '\n' | defstdin car
+[
+  {
+    "meta": {
+      "id": "car boot sale",
+      "uuid": "e71ac86e-3c03-4055-87e1-607916d8acd6",
+      "sort": "3002842000",
+      "src": "ld",
+      "section": "idioms",
+      "stems": [
+        "car boot sale"
+      ],
+      "offensive": false
+    },
+    "hwi": {
+      "hw": "car boot sale"
+    },
+    "fl": "noun",
+    "def": [
+      {
+        "sls": [
+          "British"
+        ],
+        "sseq": [
+          [
+            [
+              "sense",
+              {
+                "dt": [
+                  [
+                    "text",
+                    "{bc}a sale in which people gather to sell items that they bring to the sale in their cars"
+                  ]
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    ],
+    "shortdef": [
+      "a sale in which people gather to sell items that they bring to the sale in their cars"
+    ]
+  }
+]
+EOF
+}

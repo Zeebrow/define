@@ -67,31 +67,39 @@ func GetDefaultFilepath() string {
 	}
 }
 
+func (cfg *GlobalConfiguration) getConfigFromFile(configfile string) error {
+	var ks ConfigFile
+	r, err := ioutil.ReadFile(configfile)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(r, &ks)
+	if err != nil {
+		return err
+	}
+	cfg.MWDictionaryApiKey = ks.Dictionary
+	cfg.MWThesaurusApiKey = ks.Thesaurus
+	return nil
+}
+
 func (cfg *GlobalConfiguration) SetConfig(cliArgs CLIArgs) {
+	/*
+		Once the config filepath is known, we can decide the order which to grab the api keys.
+		CLI should always take precedence
+	*/
 	// 5th hard-coded variables
 	// 4th injected build variables
 	cfg.MWDictionaryApiKey = MWDictionaryApiKey
 	cfg.MWThesaurusApiKey = MWThesaurusApiKey
 
-	// 3rd ???
+	// 3rd I guess is default?
 	cfg.ConfigFilepath = GetDefaultFilepath()
-	func(configfile string) {
-		var ks ConfigFile
-		r, err := ioutil.ReadFile(configfile)
-		if err != nil {
-			fmt.Printf("Could not open API keys file: %s. Error: %v", configfile, err)
-			os.Exit(1)
+	if err := cfg.getConfigFromFile(cfg.ConfigFilepath); err != nil {
+		if cfg.Debug {
+			fmt.Printf("Could not get configuration from file '%s'\n", cfg.ConfigFilepath)
 		}
+	}
 
-		err = json.Unmarshal(r, &ks)
-		if err != nil {
-			fmt.Printf("Could not get dictionary API keys from file: %s. Error: %v", configfile, err)
-			os.Exit(1)
-		}
-		fmt.Printf("=========>%s\n", ks)
-		cfg.MWDictionaryApiKey = ks.Dictionary
-		cfg.MWThesaurusApiKey = ks.Thesaurus
-	}(cfg.ConfigFilepath)
 	// 2nd is Environment
 	if os.Getenv("MW_CONFIG_FILEPATH") != "" {
 		cfg.ConfigFilepath = os.Getenv("MW_CONFIG_FILEPATH")
@@ -109,4 +117,5 @@ func (cfg *GlobalConfiguration) SetConfig(cliArgs CLIArgs) {
 	if cliArgs.thesApiKey != "" {
 		cfg.MWThesaurusApiKey = cliArgs.thesApiKey
 	}
+
 }
