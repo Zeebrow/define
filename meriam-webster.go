@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 	// TODO: but is it really?
-	// Do you REALLY wanna maintain a log for this stupid thing?
+	// it could be useful for automatically recording errors
 	// "log"
 )
 
@@ -39,24 +39,11 @@ type Entry struct {
 	Fl   string
 	Meta MWMetadata
 	// Shortdef is probably all we need
-	Shortdef []string
-	Def      []Sense `json:"def"`
+	Shortdef []string `json:"shortdef"`
+	Def      []Sense  `json:"def"`
 }
 
-// General datastructure based on Merriam-Webster's API documentation
-// here: https://dictionaryapi.com/products/json#term-headword
-type MWDefn struct {
-	// The word to be defined
-	Headword string
-
-	// grammatical context for the headword.
-	// "formal", "slang", etc
-	Label string
-
-	// I think this is the glyphy representation of the headword
-	Pronunciation []byte
-}
-
+// https://dictionaryapi.com/products/json#sec-2.sseq
 type SSEQ struct {
 	Senses []Sense
 }
@@ -67,9 +54,6 @@ type GeneralSense struct {
 	// based on GeneralSense.Type
 	// I THINK this has merit...
 	SenseObject map[string]interface{}
-}
-
-type Etymology struct {
 }
 
 // Collection (list) of headwords and their definitions
@@ -94,18 +78,29 @@ type DTItem struct {
 }
 
 type MWMetadata struct {
-	Id   string
-	Uuid string
-	Sort string
-	Src  string //ignore
-
-	// Indicates the section that the entry belongs to in print
-	Section string
-
+	Id      string
+	Uuid    string
+	Sort    string
+	Src     string //ignore
+	Section string // Indicates the section that the entry belongs to in print
 	//  lists all of the entry's headwords, variants, inflections, undefined entry words, and defined run-on phrases.
 	// Each stem string is a valid search term that should match this entry.
 	Stem      map[string]string
 	Offensive bool
+}
+
+func (meta *MWMetadata) hom() string {
+	if strings.Contains(meta.Id, ":") {
+		return strings.Split(meta.Id, ":")[0]
+	}
+	return meta.Id
+}
+
+func (meta *MWMetadata) homNum() string {
+	if strings.Contains(meta.Id, ":") {
+		return strings.Split(meta.Id, ":")[1]
+	}
+	return ""
 }
 
 // This exists because I can't work with the raw api response
@@ -134,7 +129,14 @@ func (sus *MWRawAPIResp) judge() (resps *BothResps) {
 }
 
 func (e *Entry) printShortdefs() {
-	fmt.Printf("\t%s (%s)\n\t%s\n", e.Fl, e.Meta.Id, strings.Repeat("-", len(e.Fl)))
+	// fmt.Printf("\t%s (%s)\n\t%s\n", e.Fl, e.Meta.Id, strings.Repeat("-", len(e.Fl)))
+	var printString string
+	if e.Meta.homNum() != "" {
+		printString = fmt.Sprintf("\t%s (%s - Homonym %s)\n\t%s\n", e.Fl, e.Meta.hom(), e.Meta.homNum(), strings.Repeat("-", len(e.Fl)))
+	} else {
+		printString = fmt.Sprintf("\t%s (%s)\n\t%s\n", e.Fl, e.Meta.Id, strings.Repeat("-", len(e.Fl)))
+	}
+	fmt.Println(printString)
 	for i, v := range e.Shortdef {
 		fmt.Printf("\t(%d/%d)\t%s\n", i+1, len(e.Shortdef), v)
 	}
@@ -143,13 +145,41 @@ func (e *Entry) printShortdefs() {
 
 func (gr *GoodResponse) doForEntries() {
 	if GlobalConfig.Debug {
-		ne := len(gr.Entries)
-		fmt.Printf("DEBUG: Number of entries: %d\n\n", ne)
+		fmt.Printf("DEBUG: Number of entries: %d\n\n", len(gr.Entries))
 	}
-	for _, v := range gr.Entries {
+	var prevWasHomonym bool
+	var currentHasHomonym bool
+	// fmt.Println("_________")
+	for n, v := range gr.Entries {
 		// fmt.Printf("%v", v)
-		v.printShortdefs()
+		if n == 0 {
+			prevWasHomonym = true
+		}
+		if v.Meta.homNum() != "" {
+			currentHasHomonym = true
+		} else {
+			currentHasHomonym = false
+		}
+
+		if currentHasHomonym && !prevWasHomonym {
+			prevWasHomonym = true
+			fmt.Println("_________")
+			v.printShortdefs()
+		} else if currentHasHomonym && prevWasHomonym {
+			prevWasHomonym = true
+			v.printShortdefs()
+		} else if !currentHasHomonym && prevWasHomonym {
+			prevWasHomonym = false
+			fmt.Println("_________")
+			v.printShortdefs()
+		} else { //!currentHasHomonym && !prevWasHomonym
+			prevWasHomonym = false
+			fmt.Println("_________")
+			v.printShortdefs()
+		}
+
 	}
+	fmt.Println("_________")
 	fmt.Println()
 }
 
