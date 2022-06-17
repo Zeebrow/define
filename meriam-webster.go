@@ -118,8 +118,7 @@ func (sus *MWRawAPIResp) judge() (resps *BothResps) {
 			// fmt.Printf("Could not unmarshal raw api response into badresponse (Good thing). %s\n", err)
 			err = json.Unmarshal(sus.Resp, &resps.goodresponse.Entries)
 			if err != nil {
-				fmt.Printf("WTF error - Could not unmarshal into 'empty array'. %v\n", err)
-				fmt.Printf("You definitely didn't see this coming. uhhh.... exiting!\n")
+				ProgInfo.NewBugReport("Bug: Could not unmarshal json into empty array", err.Error())
 				os.Exit(1)
 			}
 			resps.isGood = true

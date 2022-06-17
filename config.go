@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 )
 
 /*
@@ -14,7 +15,7 @@ App globals
 var GlobalConfig GlobalConfiguration
 var MWDictionaryApiKey string
 var MWThesaurusApiKey string
-var ConfigFileName = ".define.conf" // idk what to name the file lol.
+var ConfigFileName = ".define.conf"
 var ProgramName = "define"
 var Version = "dev"
 var BuildDate = ""
@@ -24,17 +25,8 @@ var ProgInfo = ProgramInfo{
 	Version:     Version,
 	BuildDate:   BuildDate,
 	CommitHash:  CommitHash,
-}
-
-type ProgramInfo struct {
-	ProgramName string
-	Version     string
-	BuildDate   string
-	CommitHash  string
-}
-
-func (p *ProgramInfo) GetInfo() string {
-	return fmt.Sprintf("%s version %s (%s) built %s", p.ProgramName, p.Version, p.CommitHash, p.BuildDate)
+	OS:          runtime.GOOS,
+	GoVer:       runtime.Version(),
 }
 
 type GlobalConfiguration struct {
