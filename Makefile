@@ -36,10 +36,12 @@ install-zeebrow:
 build-dev:
 	go install .
 	go build -ldflags " \
-		-X 'main.Version=$(GIT_HASH_LONG)' \
+		-X 'main.Version=dev-$(GIT_HASH)' \
 		-X 'main.BuildDate=$(BUILD_DATE)' \
+		-X 'main.CommitHash=$(GIT_HASH_LONG)' \
+		-X 'main.ProgramName=$(PROG_NAME)' \
 		" \
-		-o build/define-$(GIT_HASH) .
+		-o build/$(PROG_NAME)-$(BUILD_DATE)-$(GIT_HASH) .
 
 build-with-keys:
 	go install .
@@ -51,7 +53,7 @@ build-with-keys:
 		-X 'main.MWDictionaryApiKey=$(MW_DICT_API_KEY)' \
 		-X 'main.MWThesaurusApiKey=$(MW_THES_API_KEY)' \
 		" \
-		-o build/define .
+		-o build/$(PROG_NAME) .
 
 build:
 	go install .
@@ -61,11 +63,13 @@ build:
 		-X 'main.CommitHash=$(GIT_HASH_LONG)' \
 		-X 'main.ProgramName=$(PROG_NAME)' \
 		" \
-		-o build/define .
+		-o build/$(PROG_NAME) .
 
 package-deb: build
+	mkdir -p build/$(GOOS)/$(GOARCH)
 	mkdir -p dist/$(PROG_NAME)/DEBIAN
 	mkdir -p dist/$(PROG_NAME)$(DEB_INSTALL_DIR)
+	cp build/$(PROG_NAME) build/$(GOOS)/$(GOARCH)/$(PROG_NAME)-$(GOOS)-$(GOARCH)
 	cp build/$(PROG_NAME) dist/$(PROG_NAME)$(DEB_INSTALL_DIR)/$(PROG_NAME)
 	touch dist/$(PROG_NAME)/DEBIAN/control
 	echo "$$DEBIAN_CONTROL" > dist/$(PROG_NAME)/DEBIAN/control
@@ -80,5 +84,6 @@ reinstall-deb: clean remove-deb package-deb
 clean:
 	rm -rf dist/
 	rm -rf build/*
+
 
 .PHONY: build clean

@@ -20,27 +20,33 @@ jobs:
         aws-region: us-east-1
         role-to-assume: arn:aws:iam::188154480716:role/github-actions-credentials
         role-session-name: gh-action-define
-
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
         go-version: 1.18
-
     - name: Test install
       run: make package-deb && sudo apt install ./build/define.deb
-
     - name: Test .deb installed properly
       run: define -version
-
     - name: Upload .deb binary
       run: |
-        aws s3 cp ./build/define.deb s3://github-artifacts-zeebrow/define/linux/amd64/
-
+        echo "$GOOS $GOARCH" 
+        aws s3 cp ./build/define.deb "s3://github-artifacts-zeebrow/define/latest-devel/$GOOS/$GOARCH/"
+        aws s3 cp "./build/$GOOS/$GOARCH/define-$GOOS-$GOARCH" "s3://github-artifacts-zeebrow/define/latest-devel/$GOOS/$GOARCH/"
+        
   build-windows-amd64:
     runs-on: windows-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
     - uses: actions/checkout@v2
-
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-region: us-east-1
+        role-to-assume: arn:aws:iam::188154480716:role/github-actions-credentials
+        role-session-name: gh-action-define
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
@@ -51,3 +57,4 @@ jobs:
         go install .
         go build .
         define.exe -version
+        aws s3 cp "./build/$GOOS/$GOARCH/define-$GOOS-$GOARCH.exe" "s3://github-artifacts-zeebrow/define/latest-devel/$GOOS/$GOARCH/"
