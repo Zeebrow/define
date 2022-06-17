@@ -8,8 +8,18 @@ on:
 jobs:
   build-debian:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
     - uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-region: us-east-1
+        role-to-assume: arn:aws:iam::188154480716:role/github-actions-credentials
+        role-session-name: gh-action-define
 
     - name: Set up Go
       uses: actions/setup-go@v2
@@ -21,6 +31,10 @@ jobs:
 
     - name: Test .deb installed properly
       run: define -version
+
+    - name: Upload .deb binary
+      run: |
+        aws s3 cp ./build/define.deb s3://github-artifacts-zeebrow/define/linux/amd64/
 
   build-windows-amd64:
     runs-on: windows-latest
