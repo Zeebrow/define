@@ -19,9 +19,12 @@ func (p *ProgramInfo) GetInfo() string {
 }
 
 func (pi *ProgramInfo) NewBugReport(title string, errorMsg string) {
-	label := url.QueryEscape("Auto-generated")
-	body := fmt.Sprintf("Version: %s\nCommit Hash: %s\nBuild Date: %s\nOS: %s\nGo Version: %s\nError Message: %s\n",
+	label := url.QueryEscape("bug")
+	cliArgs := fmt.Sprintf("## CLIArgs\nWord: %s\nStdin: %v\nDeubg: %v\n",
+		CliArgs.word, CliArgs.stdin, CliArgs.debug)
+	progInfo := fmt.Sprintf("## Program Info\nVersion: %s\nCommit Hash: %s\nBuild Date: %s\nOS: %s\nGo Version: %s\nError Message: %s\n",
 		ProgInfo.Version, ProgInfo.CommitHash, ProgInfo.BuildDate, ProgInfo.OS, ProgInfo.GoVer, errorMsg)
+	body := cliArgs + progInfo + "## Additional info\n<any other information you want to provide>"
 
 	fmt.Println("Oops! Something went wrong. If you would like to let me know it happened, click the link below to open a new issue:")
 	fmt.Println()

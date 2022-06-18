@@ -4,6 +4,8 @@ name: Go
 on:
   push:
     branches: [ master ]
+     
+# https://github.com/aws-actions/configure-aws-credentials
 
 jobs:
   build-debian:

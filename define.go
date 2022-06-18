@@ -4,14 +4,17 @@ import (
 	"os"
 )
 
-func main() {
-	var args = DoArgs()
-	GlobalConfig.SetConfig(args)
+var CliArgs CLIArgs
 
-	if args.dev {
-		DevPrintMeanings(args.word)
+func main() {
+	// var args = DoArgs()
+	CliArgs.DoArgs()
+	GlobalConfig.SetConfig(CliArgs)
+
+	if CliArgs.dev {
+		DevPrintMeanings(CliArgs.word)
 	} else {
-		GetMW(args.word, args.stdin)
+		GetMW(CliArgs.word, CliArgs.stdin)
 	}
 
 	os.Exit(0)

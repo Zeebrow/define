@@ -131,11 +131,13 @@ func (e *Entry) printShortdefs() {
 	// fmt.Printf("\t%s (%s)\n\t%s\n", e.Fl, e.Meta.Id, strings.Repeat("-", len(e.Fl)))
 	var printString string
 	if e.Meta.homNum() != "" {
-		printString = fmt.Sprintf("\t%s (%s - Homonym %s)\n\t%s\n", e.Fl, e.Meta.hom(), e.Meta.homNum(), strings.Repeat("-", len(e.Fl)))
+		printString = fmt.Sprintf("\t%s (%s - Homonym %s)\n", e.Fl, e.Meta.hom(), e.Meta.homNum())
 	} else {
-		printString = fmt.Sprintf("\t%s (%s)\n\t%s\n", e.Fl, e.Meta.Id, strings.Repeat("-", len(e.Fl)))
+		printString = fmt.Sprintf("\t%s (%s)\n", e.Fl, e.Meta.Id)
 	}
-	fmt.Println(printString)
+	underline := fmt.Sprintf("\t%s\n", strings.Repeat("-", len(printString)))
+	fmt.Printf("%s", printString)
+	fmt.Printf("%s", underline)
 	for i, v := range e.Shortdef {
 		fmt.Printf("\t(%d/%d)\t%s\n", i+1, len(e.Shortdef), v)
 	}

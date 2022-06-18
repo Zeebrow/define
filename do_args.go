@@ -29,7 +29,7 @@ func (c *CLIArgs) printDebug() {
 	fmt.Printf("version: %v\n", c.version)
 }
 
-func DoArgs() (cliargs CLIArgs) {
+func (cliargs *CLIArgs) DoArgs() {
 
 	const (
 		stdinHelp       = "Read a json from stdin instead of calling api"
