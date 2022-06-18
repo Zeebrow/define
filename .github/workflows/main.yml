@@ -33,7 +33,7 @@ jobs:
     - name: Upload .deb binary to S3
       run: |
         aws s3 cp ./build/define.deb s3://github-artifacts-zeebrow/define/latest-dev/linux/amd64/
-        aws s3 cp ./build/linux/amd64/define s3://github-artifacts-zeebrow/define/linux/amd64/
+        aws s3 cp ./build/linux/amd64/define* s3://github-artifacts-zeebrow/define/binaries/linux/
 
   build-windows-amd64:
     runs-on: windows-latest
@@ -60,4 +60,4 @@ jobs:
         define.exe -version
     - name: Upload .exe to S3
       run: |
-        aws s3 cp ./define.exe s3://github-artifacts-zeebrow/define/latest-dev/windows/amd64/
+        aws s3 cp ./define.exe s3://github-artifacts-zeebrow/define/binaries/windows/
