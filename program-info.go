@@ -15,7 +15,7 @@ type ProgramInfo struct {
 }
 
 func (p *ProgramInfo) GetInfo() string {
-	return fmt.Sprintf("%s version %s (%s) built %s", p.ProgramName, p.Version, p.CommitHash, p.BuildDate)
+	return fmt.Sprintf("%s version '%s' (%s) build date: '%s'", p.ProgramName, p.Version, p.CommitHash, p.BuildDate)
 }
 
 func (pi *ProgramInfo) NewBugReport(title string, errorMsg string) {

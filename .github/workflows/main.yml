@@ -25,15 +25,16 @@ jobs:
       with:
         go-version: 1.18
     - name: Test install
-      run: make package-deb && sudo apt install ./build/define.deb
-    - name: Test .deb installed properly
-      run: define -version
-    - name: Upload .deb binary
       run: |
-        echo "$GOOS $GOARCH" 
-        aws s3 cp ./build/define.deb "s3://github-artifacts-zeebrow/define/latest-devel/$GOOS/$GOARCH/"
-        aws s3 cp "./build/$GOOS/$GOARCH/define-$GOOS-$GOARCH" "s3://github-artifacts-zeebrow/define/latest-devel/$GOOS/$GOARCH/"
-        
+        make clean
+        make VERSION=1.0-dev package-deb 
+        sudo apt install ./build/*.deb
+        define -version
+    - name: Upload .deb binary to S3
+      run: |
+        aws s3 cp ./build/define.deb s3://github-artifacts-zeebrow/define/latest-dev/linux/amd64/
+        aws s3 cp ./build/linux/amd64/define s3://github-artifacts-zeebrow/define/linux/amd64/
+
   build-windows-amd64:
     runs-on: windows-latest
     permissions:
@@ -57,4 +58,6 @@ jobs:
         go install .
         go build .
         define.exe -version
-        aws s3 cp "./build/$GOOS/$GOARCH/define-$GOOS-$GOARCH.exe" "s3://github-artifacts-zeebrow/define/latest-devel/$GOOS/$GOARCH/"
+    - name: Upload .exe to S3
+      run: |
+        aws s3 cp ./define.exe s3://github-artifacts-zeebrow/define/latest-dev/windows/amd64/
