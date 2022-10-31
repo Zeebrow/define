@@ -62,4 +62,4 @@ jobs:
         define.exe -version
     - name: Upload .exe to S3
       run: |
-        aws s3 cp ./define*.exe s3://github-artifacts-zeebrow/define/binaries/windows/
+        aws s3 cp ./define.exe s3://github-artifacts-zeebrow/define/binaries/windows/
