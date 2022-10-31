@@ -16,18 +16,21 @@ how it works:
 what it needs:
 - automatic completion generation:
     - a runcom or executable
+- convert function name underscores to hyphens
 
 """
 
 # global
 WORD = None
 test_data = None # "cache"
+please_help = False
 please_list = False
 registered_functions = {} 
 def register_function(fname, f):
     registered_functions[fname] = f
 
 class MyBoolean(argparse.Action):
+    # pretty much copy-pasted from the argparse module
     def __init__(
         self,
                  option_strings,
@@ -43,10 +46,6 @@ class MyBoolean(argparse.Action):
         _option_strings = []
         for option_string in option_strings:
             _option_strings.append(option_string)
-
-            if option_string.startswith('--'):
-                option_string = '--no-' + option_string[2:]
-                _option_strings.append(option_string)
 
         if help is not None and default is not None and default is not argparse.SUPPRESS:
             help += " (default: %(default)s)"
@@ -92,11 +91,14 @@ dostuff_group = parser.add_mutually_exclusive_group()
 dostuff_group.add_argument("-w", "--word", dest='__word', action='store', required=False, help="word to lookup")
 parser.add_argument("-l", "--list", dest='__list', action='store_true', required=False, help="list available tests")
 # note, silently ignored kwargs...
-parser.add_argument("-h", "--help", dest='__list', action='store_true', required=False, help="list available tests")
+parser.add_argument("-h", "--help", dest='__help', action='store_true', required=False, help="print what options are available and their descriptions")
 WORD = parser.parse_known_args()[0].__word
-list = parser.parse_known_args()[0].__list
-if list:
+__list = parser.parse_known_args()[0].__list
+__help = parser.parse_known_args()[0].__help
+if __list:
     please_list = True
+if __help:
+    please_help = True
 
 
 def command(f):
@@ -109,13 +111,31 @@ def command(f):
     register_function(f.__name__, f)
 
     global test_data
-    if not please_list and test_data is None:
+    if not (please_list or please_help) and test_data is None:
         test_data = define(WORD)
 
     def wrapped_arg_function(*args, **kwargs):
         f(test_data)
 
     return wrapped_arg_function
+
+@command
+def isword(data):
+    """
+    Determine if the word exists in Merriam-Webster's dictionary.
+    If not, print out the suggestions returned.
+    """
+    is_a_word = False
+    for t in data:
+        if type(t) == type("asdf"):
+            continue
+        else:
+            print("is a word")
+            is_a_word = True
+            return
+    print("not a word. suggestions:")
+    print(data)
+    return
 
 @command
 def get_hwi(data):
@@ -156,4 +176,7 @@ if __name__ == '__main__':
     if please_list:
         for r in registered_functions.keys():
             print(f"--{r}")
+        exit()
+    if please_help:
+        parser.print_help()
         exit()
