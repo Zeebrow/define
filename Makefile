@@ -23,7 +23,6 @@ endef
 export DEBIAN_CONTROL
 
 build-with-keys:
-	go install .
 	go build -ldflags " \
 		-X 'main.Version=dev-$(GIT_HASH)' \
 		-X 'main.BuildDate=$(BUILD_DATE)' \
@@ -35,7 +34,6 @@ build-with-keys:
 		-o build/$(PROG_NAME) .
 
 build:
-	go install .
 	go build -ldflags " \
 		-X 'main.Version=dev-$(GIT_HASH)' \
 		-X 'main.BuildDate=$(BUILD_DATE)' \
@@ -46,7 +44,6 @@ build:
 
 
 build-release:
-	go install .
 	go build -ldflags " \
 		-X 'main.Version=$(VERSION)' \
 		-X 'main.BuildDate=$(BUILD_DATE)' \
