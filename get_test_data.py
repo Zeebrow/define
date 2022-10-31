@@ -118,6 +118,13 @@ def command(f):
     return wrapped_arg_function
 
 @command
+def get_hwi(data):
+    for defn in data:
+        if 'hwi' in defn.keys():
+            print(json.dumps(defn['hwi'], indent=2))
+            print("-------")
+
+@command
 def testcase(data):
     """
     doc string is arg help
