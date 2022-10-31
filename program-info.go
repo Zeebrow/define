@@ -26,7 +26,8 @@ func (pi *ProgramInfo) NewBugReport(title string, errorMsg string) {
 		ProgInfo.Version, ProgInfo.CommitHash, ProgInfo.BuildDate, ProgInfo.OS, ProgInfo.GoVer, errorMsg)
 	body := cliArgs + progInfo + "## Additional info\n<any other information you want to provide>"
 
-	fmt.Println("Oops! Something went wrong. If you would like to let me know it happened, click the link below to open a new issue:")
+	fmt.Printf("Oops! Something went wrong: '%s': '%s'\n", title, errorMsg)
+	fmt.Println("If you would like to let me know it happened, click the link below to open a new issue:")
 	fmt.Println()
 	fmt.Printf("https://github.com/Zeebrow/define/issues/new?title=%s&labels=%s&body=%s\n\n",
 		url.QueryEscape(title), url.QueryEscape(label), url.QueryEscape(body))

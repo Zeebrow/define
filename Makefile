@@ -1,8 +1,12 @@
 PROG_NAME := define
-VERSION := 0.1.1
 GIT_HASH := $(shell git rev-parse --short HEAD)
 GIT_HASH_LONG := $(shell git rev-parse HEAD)
 BUILD_DATE := $(shell date -I)
+
+ifndef ($(VERSION))
+VERSION := dev-$(GIT_HASH)
+endif
+
 GOARCH := amd64#amd64, 386, arm, ppc64
 GOOS := linux#linux, darwin, windows, netbsd
 DEB_INSTALL_DIR := /usr/local/bin
@@ -24,7 +28,7 @@ export DEBIAN_CONTROL
 
 build-with-keys:
 	go build -ldflags " \
-		-X 'main.Version=dev-$(GIT_HASH)' \
+		-X 'main.Version=$(VERSION)' \
 		-X 'main.BuildDate=$(BUILD_DATE)' \
 		-X 'main.CommitHash=$(GIT_HASH_LONG)' \
 		-X 'main.ProgramName=$(PROG_NAME)' \
@@ -35,7 +39,7 @@ build-with-keys:
 
 build:
 	go build -ldflags " \
-		-X 'main.Version=dev-$(GIT_HASH)' \
+		-X 'main.Version=$(VERSION)' \
 		-X 'main.BuildDate=$(BUILD_DATE)' \
 		-X 'main.CommitHash=$(GIT_HASH_LONG)' \
 		-X 'main.ProgramName=$(PROG_NAME)' \
@@ -94,4 +98,4 @@ reinstall-deb-release: clean release-deb
 	sudo apt install ./build/*.deb
 
 
-.PHONY: build
+.PHONY: build test
