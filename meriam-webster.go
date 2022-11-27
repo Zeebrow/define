@@ -9,19 +9,18 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	// TODO: but is it really?
-	// it could be useful for automatically recording errors
-	// "log"
 )
 
-type MWRawAPIResp struct {
-	// This needs to handle both good AND bad responses
-	// All responses will have status 200.
-	// not sure how to implement UnmarshalJSON interface, if that's best.
-	Resp []byte
+type MWRawAPI struct {
+	Headword     string
+	Resp         []byte
+	isGood       bool
+	goodresponse GoodResponse
+	badresponse  []string
 }
 
-func (mwresp *MWRawAPIResp) Get(headword string, stdin bool) error {
+func (mwresp *MWRawAPI) lookup(headword string, stdin bool) error {
+	mwresp.Headword = headword
 	var t []byte
 	var url string
 	var err error
@@ -31,6 +30,7 @@ func (mwresp *MWRawAPIResp) Get(headword string, stdin bool) error {
 		t, err = reader.ReadBytes('\n')
 		if err != io.EOF && err != nil {
 			fmt.Println(err)
+			return err
 		}
 	} else {
 		url = fmt.Sprintf("https://www.dictionaryapi.com/api/v3/references/collegiate/json/%s?key=%s", headword, GlobalConfig.MWDictionaryApiKey)
@@ -50,25 +50,15 @@ func (mwresp *MWRawAPIResp) Get(headword string, stdin bool) error {
 	}
 	if GlobalConfig.Debug {
 		fmt.Printf("url: %s\n", url)
-		// fmt.Println(rawResp)
 	}
 	mwresp.Resp = t
 
 	return nil
 }
 
-type BothResps struct {
-	isGood       bool
-	goodresponse GoodResponse
-	badresponse  BadResponse
-}
-
-type BadResponse struct {
-	Suggestions []string
-}
-
 type GoodResponse struct {
-	Entries []Entry
+	Headword string
+	Entries  []Entry
 }
 
 type Prs struct {
@@ -80,38 +70,10 @@ type HWI struct {
 
 // top-level respsonse object
 type Entry struct {
-	Fl   string
-	Meta MWMetadata
-	// Shortdef is probably all we need
-	Shortdef []string `json:"shortdef"`
-	Def      []Sense  `json:"def"`
+	Fl       string
+	Meta     MWMetadata
 	Hwi      HWI      `json:"hwi,omitempty"`
-}
-
-// https://dictionaryapi.com/products/json#sec-2.sseq
-type SSEQ struct {
-	Senses []Sense
-}
-
-// Collection (list) of headwords and their definitions
-type Sense struct {
-	// index of a particular sense in a list of senses.
-	SenseNumber string `json:"sn"`
-	//Status Label https://dictionaryapi.com/products/json#sec-2.sls
-	SLS []string `json:"sls,omitempty"`
-
-	// Defining text. Meat and potatoes.
-	DT DefiningText `json:"dt"`
-}
-
-// Basically a janky map, in array form
-type DefiningText struct {
-	DTArray []DTItem
-}
-
-type DTItem struct {
-	// https://dictionaryapi.com/products/json#sec-2.dt
-	Item map[string]string
+	Shortdef []string `json:"shortdef"`
 }
 
 type MWMetadata struct {
@@ -144,24 +106,20 @@ func (meta *MWMetadata) homNum() string {
 // from Merriam-Webster. It's an array of X.
 // response = 200, regardless of whether word exists in dictionary,
 // so we cram response into structs and see where it doesn't fit.
-func (sus *MWRawAPIResp) judge() (resps *BothResps) {
-	resps = new(BothResps)
-	resps.isGood = false
-	err := json.Unmarshal(sus.Resp, &resps.badresponse)
+func (sus *MWRawAPI) judge() { //aka unmarshal?
+	sus.isGood = false
+	err := json.Unmarshal(sus.Resp, &sus.badresponse)
 	if err != nil {
-		// fmt.Printf("Could not unmarshal raw api response into badresponse (Good thing). %s\n", err)
-		err = json.Unmarshal(sus.Resp, &resps.badresponse)
+		// potentially a good response
+		err = json.Unmarshal(sus.Resp, &sus.goodresponse.Entries)
 		if err != nil {
-			// fmt.Printf("Could not unmarshal raw api response into badresponse (Good thing). %s\n", err)
-			err = json.Unmarshal(sus.Resp, &resps.goodresponse.Entries)
-			if err != nil {
-				ProgInfo.NewBugReport("Bug: Could not unmarshal json into empty array", err.Error())
-				os.Exit(1)
-			}
-			resps.isGood = true
+			fmt.Println(string(sus.Resp))
+			ProgInfo.NewBugReport("Bug: Could not unmarshal json into empty array", err.Error())
+			os.Exit(1)
 		}
+		sus.goodresponse.Headword = sus.Headword
+		sus.isGood = true
 	}
-	return
 }
 
 func (e *Entry) printShortdefs() {
@@ -181,15 +139,33 @@ func (e *Entry) printShortdefs() {
 	fmt.Println()
 }
 
+type outputJSON struct {
+	Headword      string
+	HomonymGroups []HomonymEntry
+}
+type HomonymEntry struct {
+	HomonymSense string
+	PartOfSpeech string
+	Definitions  []string
+}
+
+func (gr *GoodResponse) sortByHomonym() outputJSON {
+	oj := &outputJSON{Headword: gr.Headword}
+	for _, e := range gr.Entries {
+		hEntry := &HomonymEntry{HomonymSense: e.Meta.Id, PartOfSpeech: e.Fl, Definitions: e.Shortdef}
+		oj.HomonymGroups = append(oj.HomonymGroups, *hEntry)
+	}
+	return *oj
+}
+
 func (gr *GoodResponse) doForEntries() {
 	if GlobalConfig.Debug {
 		fmt.Printf("DEBUG: Number of entries: %d\n\n", len(gr.Entries))
 	}
 	var prevWasHomonym bool
 	var currentHasHomonym bool
-	// fmt.Println("_________")
+	/*group definitions together by homonym, separate by crappy little line*/
 	for n, v := range gr.Entries {
-		// fmt.Printf("%v", v)
 		if n == 0 {
 			prevWasHomonym = true
 		}
@@ -217,26 +193,33 @@ func (gr *GoodResponse) doForEntries() {
 		}
 
 	}
-	fmt.Println("_________")
-	fmt.Println()
-}
-
-func (gr *GoodResponse) PrintRawMWResponse() {
-	fmt.Printf("%v", gr.Entries)
 }
 
 func GetMW(headword string, stdin bool) {
-	var r MWRawAPIResp
-	err := r.Get(headword, stdin)
+	var r MWRawAPI
+	err := r.lookup(headword, stdin)
 	if err != nil {
 		panic(err)
 	}
-	br := r.judge()
-	if br.isGood {
-		fmt.Println(headword + ":")
-		br.goodresponse.doForEntries()
+	r.judge()
+	if r.isGood {
+		// r.goodresponse.doForEntries()
+		homonyms := r.goodresponse.sortByHomonym()
+		outpoutJson, err := json.MarshalIndent(homonyms, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(outpoutJson))
+		// fmt.Printf("'%s':\n\n", homonyms.headword)
+		// for i, h := range homonyms.HomonymGroups {
+		// 	fmt.Println("-------------------")
+		// 	fmt.Printf("sense %d - %s (%s)\n", i+1, h.HomonymSense, h.PartOfSpeech)
+		// 	for j, d := range h.Definitions {
+		// 		fmt.Printf("\t%d) %s\n", j+1, d)
+		// 	}
+		// }
 	} else {
 		fmt.Printf("Bad response: \n")
-		fmt.Printf("%v\n", br.badresponse.Suggestions)
+		fmt.Printf("%v\n", r.badresponse)
 	}
 }
