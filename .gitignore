@@ -6,6 +6,8 @@ ezget
 build
 dist
 ERRORS.md
+python-way/venv
+python-way/cachefile
 
 # binary output of go build
 define
