@@ -1,13 +1,19 @@
 tmp
-*.swp
+*.sw?
 *.json
 .MW-api-keys
-ezget
-build
-dist
+outputs
 ERRORS.md
+TODO.md
+
+
+# helper scripts
+ezget
 python-way/venv
 python-way/cachefile
 
-# binary output of go build
+# build artifacts
 define
+build
+dist
+SUMS.md5

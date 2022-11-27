@@ -139,7 +139,7 @@ func (e *Entry) printShortdefs() {
 	fmt.Println()
 }
 
-type outputJSON struct {
+type HomonymJSON struct {
 	Headword      string
 	HomonymGroups []HomonymEntry
 }
@@ -149,8 +149,8 @@ type HomonymEntry struct {
 	Definitions  []string
 }
 
-func (gr *GoodResponse) sortByHomonym() outputJSON {
-	oj := &outputJSON{Headword: gr.Headword}
+func (gr *GoodResponse) groupByHomonym() HomonymJSON {
+	oj := &HomonymJSON{Headword: gr.Headword}
 	for _, e := range gr.Entries {
 		hEntry := &HomonymEntry{HomonymSense: e.Meta.Id, PartOfSpeech: e.Fl, Definitions: e.Shortdef}
 		oj.HomonymGroups = append(oj.HomonymGroups, *hEntry)
@@ -204,7 +204,7 @@ func GetMW(headword string, stdin bool) {
 	r.judge()
 	if r.isGood {
 		// r.goodresponse.doForEntries()
-		homonyms := r.goodresponse.sortByHomonym()
+		homonyms := r.goodresponse.groupByHomonym()
 		outpoutJson, err := json.MarshalIndent(homonyms, "", "  ")
 		if err != nil {
 			panic(err)
