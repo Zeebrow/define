@@ -13,7 +13,6 @@ python-way/venv
 python-way/cachefile
 
 # build artifacts
-define
 build
 dist
 SUMS.md5
