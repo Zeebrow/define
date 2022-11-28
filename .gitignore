@@ -16,3 +16,4 @@ python-way/cachefile
 build
 dist
 SUMS.md5
+*.zip

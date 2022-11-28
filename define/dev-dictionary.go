@@ -3,7 +3,7 @@ package define
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -74,7 +74,7 @@ func devGetDef(word string) APIResp {
 		fmt.Printf("ERROR request returned response code %d. Probably not a word: %s\n", resp_code, word)
 		os.Exit(1)
 	}
-	b, _ := ioutil.ReadAll(res.Body)
+	b, _ := io.ReadAll(res.Body)
 	err = json.Unmarshal(b, &dictionaryapi_response)
 	if err != nil {
 		fmt.Println(err)

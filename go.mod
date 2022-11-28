@@ -1,4 +1,4 @@
-module github.com/zeebrow/define
+module github.com/Zeebrow/define
 
 go 1.18
 

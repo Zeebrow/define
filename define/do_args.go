@@ -6,6 +6,11 @@ import (
 	"os"
 )
 
+type LambdaConfig struct {
+	DictApiKey string
+	Word       string
+}
+
 type CliArgs struct {
 	// more = use Merriam-Webster
 	Stdin       bool

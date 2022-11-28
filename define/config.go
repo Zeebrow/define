@@ -3,7 +3,6 @@ package define
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -55,7 +54,6 @@ type ConfigFile struct {
 }
 
 func (gc *GlobalConfiguration) printDebug() {
-	fmt.Printf("-------------global config-------------\n")
 	fmt.Printf("MWDictionaryApiKey : %s\n", gc.MWDictionaryApiKey)
 	fmt.Printf("MWThesaurusApiKey  : %s\n", gc.MWThesaurusApiKey)
 	fmt.Printf("ConfigFilepath     : %s\n", gc.ConfigFilepath)
@@ -68,13 +66,13 @@ func GetDefaultFilepath() string {
 		fmt.Println("Could not get user home directory... searching current directory for config")
 		return ConfigFileName
 	} else {
-		return fmt.Sprintf("%s", filepath.Join(dirname, ConfigFileName))
+		return filepath.Join(dirname, ConfigFileName)
 	}
 }
 
 func (cfg *GlobalConfiguration) getConfigFromFile(configfile string) error {
 	var ks ConfigFile
-	r, err := ioutil.ReadFile(configfile)
+	r, err := os.ReadFile(configfile)
 	if err != nil {
 		return err
 	}
