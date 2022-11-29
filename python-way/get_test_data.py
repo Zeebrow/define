@@ -15,13 +15,6 @@ if logger.getEffectiveLevel() == 10:
     logger.addHandler(sh)
 
 
-# global
-WORD = None
-test_data = None # "cache"
-please_help = False
-please_list = False
-registered_functions = {} 
-
 pass_definition = click.make_pass_decorator(Definition)
 
 @click.group()

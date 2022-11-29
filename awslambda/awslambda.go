@@ -16,8 +16,6 @@ func HandleRequest(ctx context.Context, word string) {
 		fmt.Println("MW_DICT_API_KEY is not set")
 		os.Exit(1)
 	}
-	fmt.Println(MW_DICT_API_KEY)
-	return
 	mw := define.NewApi(MW_DICT_API_KEY)
 	mw.Define(word)
 	if mw.Response != nil {

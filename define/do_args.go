@@ -71,5 +71,4 @@ func (cliargs *CliArgs) DoArgs() {
 	} else {
 		cliargs.Word = flag.Arg(0)
 	}
-	return
 }

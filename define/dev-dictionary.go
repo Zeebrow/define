@@ -11,9 +11,8 @@ import (
 )
 
 type APIResp struct {
-	Word      string `json:"word"`
-	phonetics interface{}
-	Meanings  []Meaning `json:"meanings"`
+	Word     string    `json:"word"`
+	Meanings []Meaning `json:"meanings"`
 }
 
 type Defn struct {
@@ -26,42 +25,6 @@ type Meaning struct {
 	PartOfSpeech string `json:"partOfSpeech"`
 	Definitions  []Defn `json:"definitions"`
 }
-
-type ErrResp struct {
-	title       string
-	message     string
-	resolution  string
-	status_code int
-}
-
-// should call a getter, which returns "what we want"
-// What we want is all the definitions of the entered word
-
-const lgutterlen = 2
-
-const apiresp_template = `
-{{.Word}}
-
-{{range $POS, $DEFNS := .Meanings}}
-
-{{range $DEFN := .}}
-
-{{end}}
-`
-
-const meanings_template = ``
-const defn_template = ` {{.}}
-`
-const synonyms_template = `
-    Synonyms:{{if .}}{{range $SYNONS := .}}
-      - {{.}}{{end}}
-	  {{else}} None{{end}}
-`
-
-// globaler to store all and let user decide what parts we need to return
-var resp APIResp
-var tab = "  "
-var cols int
 
 func devGetDef(word string) APIResp {
 	var dictionaryapi_response []APIResp
@@ -84,6 +47,13 @@ func devGetDef(word string) APIResp {
 }
 
 func devAllDefns(d Defn) {
+	const defn_template = ` {{.}}
+	`
+	const synonyms_template = `
+		Synonyms:{{if .}}{{range $SYNONS := .}}
+		- {{.}}{{end}}
+		{{else}} None{{end}}
+	`
 
 	dt := template.New("dt")
 	_dt, err := dt.Parse(defn_template)
@@ -107,6 +77,7 @@ func devAllDefns(d Defn) {
 }
 
 func DevPrintMeanings(word string) {
+	const tab = "  "
 	resp := devGetDef(word)
 	uline := strings.Repeat("-", len(resp.Word))
 	fmt.Printf("\n%s\n", resp.Word)

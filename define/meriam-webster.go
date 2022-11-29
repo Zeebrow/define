@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
+	"text/template"
 )
 
 type MWRawAPI struct {
@@ -57,7 +59,7 @@ func (mw *MWRawAPI) Define(headword string) {
 		fmt.Printf("Failed to get data from '%s': '%v'", url, err)
 		panic(err)
 	}
-	fmt.Printf("%d\n", resp.StatusCode)
+	// fmt.Printf("%d\n", resp.StatusCode)
 
 	t, err = io.ReadAll(resp.Body)
 	if err != nil {
@@ -91,15 +93,16 @@ func (meta *MWMetadata) homNum() string {
 // so we cram response into structs and see where it doesn't fit.
 func (sus *MWRawAPI) judge(t []byte) error {
 	var sugs []string
+	var resp Response
+
+	resp.Headword = sus.Headword
 	err := json.Unmarshal(t, &sugs)
 	if err != nil {
-		var resp Response
 		err = json.Unmarshal(t, &resp.Entries)
 		if err != nil {
 			return err
 		}
 		sus.Response = &resp
-		fmt.Printf("response: %+v\n", sus.Response)
 		return nil
 	} else {
 		sus.Suggestions = &sugs
@@ -129,20 +132,54 @@ type HomonymJSON struct {
 	HomonymGroups []HomonymEntry
 }
 
+/*context for Definitions*/
 type HomonymEntry struct {
-	/*context for Definitions*/
+	SenseIndex   int
 	HomonymSense string
 	PartOfSpeech string
 	Definitions  []string
 }
 
+func (h *HomonymJSON) Print() {
+	underline := func(word string) string {
+		underline := ""
+		for i := 0; i < len(word); i++ {
+			underline += "-"
+		}
+		return underline
+	}
+	ul := underline("Definition of " + h.Headword + "'': ")
+
+	hjTemplate := `
+	Definitions for '{{.Headword}}':
+	` + ul + `
+	{{range $HOMONYMGROUPS := .HomonymGroups}}
+		┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+		┃ {{.PartOfSpeech}} ({{.HomonymSense}}) 
+		┠────────────────────────────────────────{{range $DEF := .Definitions}}
+		┃ - {{.}}{{end}}
+	{{end}}
+	`
+	ht := template.New("HomonymGrouping")
+	t, err := ht.Parse(hjTemplate)
+	if err != nil {
+		fmt.Printf("template error: %v\n", err)
+	}
+	err = t.Execute(os.Stdout, h)
+	if err != nil {
+		fmt.Printf("template execute error: %v\n", err)
+	}
+
+}
+
 func (r *Response) GroupByHomonym() HomonymJSON {
-	oj := &HomonymJSON{Headword: r.Headword}
-	for _, e := range r.Entries {
-		hEntry := &HomonymEntry{HomonymSense: e.Meta.Id, PartOfSpeech: e.Fl, Definitions: e.Shortdef}
+	var oj HomonymJSON
+	oj.Headword = r.Headword
+	for i, e := range r.Entries {
+		hEntry := &HomonymEntry{SenseIndex: i + 1, HomonymSense: e.Meta.Id, PartOfSpeech: e.Fl, Definitions: e.Shortdef}
 		oj.HomonymGroups = append(oj.HomonymGroups, *hEntry)
 	}
-	return *oj
+	return oj
 }
 
 func (r *Response) doForEntries() {
@@ -184,11 +221,12 @@ func GetMW(headword string, key string) {
 	mw.Define(headword)
 	if mw.Response != nil {
 		homonyms := mw.Response.GroupByHomonym()
-		outpoutJson, err := json.MarshalIndent(homonyms, "", "  ")
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(string(outpoutJson))
+		homonyms.Print()
+		// outpoutJson, err := json.MarshalIndent(homonyms, "", "  ")
+		// if err != nil {
+		// 	panic(err)
+		// }
+		// fmt.Println(string(outpoutJson))
 	} else {
 		fmt.Printf("'%s' isn't a word. Did you mean one of these?\ni%v", headword, mw.Suggestions)
 	}
