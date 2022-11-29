@@ -7,6 +7,7 @@ ifndef ($(VERSION))
 VERSION := dev-$(GIT_HASH)
 endif
 
+TGT_FILE := cmd/define.go
 GOARCH := amd64#amd64, 386, arm, ppc64
 GOOS := linux#linux, darwin, windows, netbsd
 DEB_INSTALL_DIR := /usr/local/bin
@@ -35,7 +36,7 @@ build-with-keys:
 		-X 'main.MWDictionaryApiKey=$(MW_DICT_API_KEY)' \
 		-X 'main.MWThesaurusApiKey=$(MW_THES_API_KEY)' \
 		" \
-		-o build/$(PROG_NAME) .
+		-o build/$(PROG_NAME) $(TGT_FILE) 
 
 build:
 	go build -ldflags " \
@@ -44,7 +45,7 @@ build:
 		-X 'main.CommitHash=$(GIT_HASH_LONG)' \
 		-X 'main.ProgramName=$(PROG_NAME)' \
 		" \
-		-o build/$(PROG_NAME) .
+		-o build/$(PROG_NAME) $(TGT_FILE) 
 
 
 build-release:
@@ -54,7 +55,7 @@ build-release:
 		-X 'main.CommitHash=$(GIT_HASH_LONG)' \
 		-X 'main.ProgramName=$(PROG_NAME)' \
 		" \
-		-o build/$(PROG_NAME)-$(VERSION) .
+		-o build/$(PROG_NAME)-$(VERSION) $(TGT_FILE) 
 
 release-deb: build
 	mkdir -p build/$(GOOS)/$(GOARCH)
