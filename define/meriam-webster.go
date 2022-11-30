@@ -2,7 +2,6 @@ package define
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,23 +11,25 @@ import (
 )
 
 type MWRawAPI struct {
-	DictApiKey  string
-	Headword    string
-	Response    *Response
-	Suggestions *[]string
+	DictApiKey string
+	Headword   string
+	// DefinitionSet *DefinitionSet
+	// Suggestions   *[]string
 }
 
-func NewApi(key string) *MWRawAPI {
+func NewDictionary(apiKey string) *MWRawAPI {
 	var mw MWRawAPI
-	mw.DictApiKey = key
-	mw.Response = nil
-	mw.Suggestions = nil
+	mw.DictApiKey = apiKey
+	// mw.DefinitionSet = nil
+	// mw.Suggestions = nil
 	return &mw
 }
 
-type Response struct {
-	Headword string
-	Entries  []Entry
+/*The return value for Define()*/
+type DefinitionSet struct {
+	Headword    string
+	Entries     []Entry
+	Suggestions *[]string
 }
 
 type Entry struct {
@@ -49,7 +50,8 @@ type MWMetadata struct {
 	Offensive bool
 }
 
-func (mw *MWRawAPI) Define(headword string) {
+func (mw *MWRawAPI) Define(headword string) *DefinitionSet { // @@@ maybe the suggestions should be returned as an error
+	var ds DefinitionSet = DefinitionSet{}
 	mw.Headword = headword
 	var t []byte
 	url := fmt.Sprintf("https://www.dictionaryapi.com/api/v3/references/collegiate/json/%s?key=%s", headword, mw.DictApiKey)
@@ -59,7 +61,7 @@ func (mw *MWRawAPI) Define(headword string) {
 		fmt.Printf("Failed to get data from '%s': '%v'", url, err)
 		panic(err)
 	}
-	// fmt.Printf("%d\n", resp.StatusCode)
+	// fmt.Printf("%d\n", resp.StatusCode) // good feild for Dictionary type
 
 	t, err = io.ReadAll(resp.Body)
 	if err != nil {
@@ -67,10 +69,21 @@ func (mw *MWRawAPI) Define(headword string) {
 		fmt.Printf("Server responded: %d\n", resp.StatusCode)
 		panic(err)
 	}
-	err = mw.judge(t)
+
+	//err = mw.judge()
+	err = json.Unmarshal(t, &ds.Suggestions)
 	if err != nil {
-		fmt.Printf("error judging: %s\n", err)
+		// got good definition
+		err = json.Unmarshal(t, &ds.Entries)
+		if err != nil {
+			panic(err) //crap
+		}
+		return &ds
+	} else {
+		//got suggestions instead
+		ds.Entries = nil
 	}
+	panic("bug: could not unmarshal response into suggestions or entries")
 }
 
 func (meta *MWMetadata) hom() string {
@@ -85,29 +98,6 @@ func (meta *MWMetadata) homNum() string {
 		return strings.Split(meta.Id, ":")[1]
 	}
 	return ""
-}
-
-// This exists because I can't work with the raw api response
-// from Merriam-Webster. It's an array of X.
-// response = 200, regardless of whether word exists in dictionary,
-// so we cram response into structs and see where it doesn't fit.
-func (sus *MWRawAPI) judge(t []byte) error {
-	var sugs []string
-	var resp Response
-
-	resp.Headword = sus.Headword
-	err := json.Unmarshal(t, &sugs)
-	if err != nil {
-		err = json.Unmarshal(t, &resp.Entries)
-		if err != nil {
-			return err
-		}
-		sus.Response = &resp
-		return nil
-	} else {
-		sus.Suggestions = &sugs
-	}
-	return errors.New("error unmarshalling response")
 }
 
 func (e *Entry) printShortdefs() {
@@ -127,20 +117,20 @@ func (e *Entry) printShortdefs() {
 	fmt.Println()
 }
 
-type HomonymJSON struct {
-	Headword      string
-	HomonymGroups []HomonymEntry
+type SimpleHomonymJSON struct {
+	Headword            string
+	SimpleHomonymGroups []SimpleHomonymEntry
 }
 
 /*context for Definitions*/
-type HomonymEntry struct {
+type SimpleHomonymEntry struct {
 	SenseIndex   int
 	HomonymSense string
 	PartOfSpeech string
 	Definitions  []string
 }
 
-func (h *HomonymJSON) Print() {
+func (h *SimpleHomonymJSON) Print() {
 	underline := func(word string) string {
 		underline := ""
 		for i := 0; i < len(word); i++ {
@@ -153,13 +143,13 @@ func (h *HomonymJSON) Print() {
 	hjTemplate := `
 Definitions for '{{.Headword}}':
 ` + ul + `
-{{range $HOMONYMGROUPS := .HomonymGroups}}
+{{range $HOMONYMGROUPS := .SimpleHomonymGroups}}
 	┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 	┃ {{.PartOfSpeech}} ({{.HomonymSense}}) 
 	┠────────────────────────────────────────{{range $DEF := .Definitions}}
 	┃ - {{.}}{{end}}
 {{end}}` + "\n"
-	ht := template.New("HomonymGrouping")
+	ht := template.New("SimpleHomonymGrouping")
 	t, err := ht.Parse(hjTemplate)
 	if err != nil {
 		fmt.Printf("template error: %v\n", err)
@@ -171,17 +161,18 @@ Definitions for '{{.Headword}}':
 
 }
 
-func (r *Response) GroupByHomonym() HomonymJSON {
-	var oj HomonymJSON
+/*Parse the raw Merriam-Webster response for the text required to define a word's possible meanings.*/
+func (r *DefinitionSet) GetSimpleHomonymJSON() SimpleHomonymJSON {
+	var oj SimpleHomonymJSON
 	oj.Headword = r.Headword
 	for i, e := range r.Entries {
-		hEntry := &HomonymEntry{SenseIndex: i + 1, HomonymSense: e.Meta.Id, PartOfSpeech: e.Fl, Definitions: e.Shortdef}
-		oj.HomonymGroups = append(oj.HomonymGroups, *hEntry)
+		hEntry := &SimpleHomonymEntry{SenseIndex: i + 1, HomonymSense: e.Meta.Id, PartOfSpeech: e.Fl, Definitions: e.Shortdef}
+		oj.SimpleHomonymGroups = append(oj.SimpleHomonymGroups, *hEntry)
 	}
 	return oj
 }
 
-func (r *Response) doForEntries() {
+func (r *DefinitionSet) doForEntries() {
 	var prevWasHomonym bool
 	var currentHasHomonym bool
 	/*group definitions together by homonym, separate by crappy little line*/
@@ -212,21 +203,5 @@ func (r *Response) doForEntries() {
 			v.printShortdefs()
 		}
 
-	}
-}
-
-func GetMW(headword string, key string) {
-	mw := NewApi(key)
-	mw.Define(headword)
-	if mw.Response != nil {
-		homonyms := mw.Response.GroupByHomonym()
-		homonyms.Print()
-		// outpoutJson, err := json.MarshalIndent(homonyms, "", "  ")
-		// if err != nil {
-		// 	panic(err)
-		// }
-		// fmt.Println(string(outpoutJson))
-	} else {
-		fmt.Printf("'%s' isn't a word. Did you mean one of these?\ni%v", headword, mw.Suggestions)
 	}
 }
