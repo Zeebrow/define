@@ -151,15 +151,14 @@ func (h *HomonymJSON) Print() {
 	ul := underline("Definition of " + h.Headword + "'': ")
 
 	hjTemplate := `
-	Definitions for '{{.Headword}}':
-	` + ul + `
-	{{range $HOMONYMGROUPS := .HomonymGroups}}
-		┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-		┃ {{.PartOfSpeech}} ({{.HomonymSense}}) 
-		┠────────────────────────────────────────{{range $DEF := .Definitions}}
-		┃ - {{.}}{{end}}
-	{{end}}
-	`
+Definitions for '{{.Headword}}':
+` + ul + `
+{{range $HOMONYMGROUPS := .HomonymGroups}}
+	┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+	┃ {{.PartOfSpeech}} ({{.HomonymSense}}) 
+	┠────────────────────────────────────────{{range $DEF := .Definitions}}
+	┃ - {{.}}{{end}}
+{{end}}` + "\n"
 	ht := template.New("HomonymGrouping")
 	t, err := ht.Parse(hjTemplate)
 	if err != nil {
