@@ -4,7 +4,7 @@ GIT_HASH_LONG := $(shell git rev-parse HEAD)
 BUILD_DATE := $(shell date -I)
 
 ifndef ($(VERSION))
-VERSION := dev-$(GIT_HASH)
+VERSION := 0.1.0-dev-$(GIT_HASH)
 endif
 
 TGT_FILE := cmd/define.go
