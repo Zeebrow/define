@@ -57,8 +57,9 @@ jobs:
 
     - name: Build and test
       run: |
+        cd cmd
         go install .
-        go build cmd/define.go
+        go build -o define.exe .
         define.exe -version
     - name: Upload .exe to S3
       run: |
