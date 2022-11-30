@@ -59,8 +59,8 @@ jobs:
       run: |
         cd cmd
         go install .
-        go build -o .\define.exe .
-        define.exe -version
+        go build -o define.exe .
+        .\define.exe -version
     - name: Upload .exe to S3
       run: |
         echo "this is a comment"
