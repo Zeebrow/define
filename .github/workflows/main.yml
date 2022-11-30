@@ -64,4 +64,4 @@ jobs:
     - name: Upload .exe to S3
       run: |
         echo "this is a comment"
-        aws s3 cp ./define.exe s3://github-artifacts-zeebrow/define/binaries/windows/
+        aws s3 cp ./build/define.exe s3://github-artifacts-zeebrow/define/binaries/windows/
