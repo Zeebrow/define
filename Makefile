@@ -39,8 +39,6 @@ build-with-keys:
 		-o build/$(PROG_NAME) $(TGT_FILE) 
 
 build:
-	echo $(VERSION)
-	echo $(GIT_HASH_LONG)
 	go build -ldflags " \
 		-X 'github.com/Zeebrow/define/define.Version=$(VERSION)' \
 		-X 'github.com/Zeebrow/define/define.BuildDate=$(BUILD_DATE)' \
