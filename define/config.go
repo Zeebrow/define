@@ -43,9 +43,9 @@ var ProgInfo = ProgramInfo{
 
 type GlobalConfiguration struct {
 	MWDictionaryApiKey string
-	MWThesaurusApiKey  string
-	ConfigFilepath     string
-	Debug              bool
+	// MWThesaurusApiKey  string
+	ConfigFilepath string
+	Debug          bool
 }
 
 type ConfigFile struct {
@@ -55,7 +55,7 @@ type ConfigFile struct {
 
 func (gc *GlobalConfiguration) printDebug() {
 	fmt.Printf("MWDictionaryApiKey : %s\n", gc.MWDictionaryApiKey)
-	fmt.Printf("MWThesaurusApiKey  : %s\n", gc.MWThesaurusApiKey)
+	// fmt.Printf("MWThesaurusApiKey  : %s\n", gc.MWThesaurusApiKey)
 	fmt.Printf("ConfigFilepath     : %s\n", gc.ConfigFilepath)
 	fmt.Printf("Debug              : %v\n", gc.Debug)
 }
@@ -81,7 +81,7 @@ func (cfg *GlobalConfiguration) getConfigFromFile(configfile string) error {
 		return err
 	}
 	cfg.MWDictionaryApiKey = ks.Dictionary
-	cfg.MWThesaurusApiKey = ks.Thesaurus
+	// cfg.MWThesaurusApiKey = ks.Thesaurus
 	return nil
 }
 
@@ -93,7 +93,7 @@ func (cfg *GlobalConfiguration) SetConfig(cliArgs CliArgs) {
 	// 5th hard-coded variables
 	// 4th injected build variables
 	cfg.MWDictionaryApiKey = MWDictionaryApiKey
-	cfg.MWThesaurusApiKey = MWThesaurusApiKey
+	// cfg.MWThesaurusApiKey = MWThesaurusApiKey
 
 	// 3rd I guess is default?
 	cfg.ConfigFilepath = GetDefaultFilepath()
@@ -110,15 +110,15 @@ func (cfg *GlobalConfiguration) SetConfig(cliArgs CliArgs) {
 	if os.Getenv("MW_DICTIONARY_API_KEY") != "" {
 		cfg.MWDictionaryApiKey = os.Getenv("MW_DICTIONARY_API_KEY")
 	}
-	if os.Getenv("MW_THESAURUS_API_KEY") != "" {
-		cfg.MWThesaurusApiKey = os.Getenv("MW_THESAURUS_API_KEY")
-	}
+	// if os.Getenv("MW_THESAURUS_API_KEY") != "" {
+	// 	cfg.MWThesaurusApiKey = os.Getenv("MW_THESAURUS_API_KEY")
+	// }
 	// 1st CLI args
 	if cliArgs.DictApiKey != "" {
 		cfg.MWDictionaryApiKey = cliArgs.DictApiKey
 	}
-	if cliArgs.ThesApiKey != "" {
-		cfg.MWThesaurusApiKey = cliArgs.ThesApiKey
-	}
+	// if cliArgs.ThesApiKey != "" {
+	// 	cfg.MWThesaurusApiKey = cliArgs.ThesApiKey
+	// }
 
 }
