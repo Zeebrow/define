@@ -25,7 +25,7 @@ func NewDictionary(apiKey string) *MWRawAPI {
 	return &mw
 }
 
-/*The return value for Define()*/
+/*The return value for Define*/
 type DefinitionSet struct {
 	Headword    string
 	Entries     []Entry
@@ -53,6 +53,7 @@ type MWMetadata struct {
 func (mw *MWRawAPI) Define(headword string) *DefinitionSet { // @@@ maybe the suggestions should be returned as an error
 	var ds DefinitionSet = DefinitionSet{}
 	mw.Headword = headword
+	ds.Headword = headword
 	var t []byte
 	url := fmt.Sprintf("https://www.dictionaryapi.com/api/v3/references/collegiate/json/%s?key=%s", headword, mw.DictApiKey)
 
