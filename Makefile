@@ -29,31 +29,33 @@ export DEBIAN_CONTROL
 
 build-with-keys:
 	go build -ldflags " \
-		-X 'main.Version=$(VERSION)' \
-		-X 'main.BuildDate=$(BUILD_DATE)' \
-		-X 'main.CommitHash=$(GIT_HASH_LONG)' \
-		-X 'main.ProgramName=$(PROG_NAME)' \
-		-X 'main.MWDictionaryApiKey=$(MW_DICT_API_KEY)' \
-		-X 'main.MWThesaurusApiKey=$(MW_THES_API_KEY)' \
+		-X 'github.com/Zeebrow/define/define.Version=$(VERSION)' \
+		-X 'github.com/Zeebrow/define/define.BuildDate=$(BUILD_DATE)' \
+		-X 'github.com/Zeebrow/define/define.CommitHash=$(GIT_HASH_LONG)' \
+		-X 'github.com/Zeebrow/define/define.ProgramName=$(PROG_NAME)' \
+		-X 'github.com/Zeebrow/define/define.MWDictionaryApiKey=$(MW_DICT_API_KEY)' \
+		-X 'github.com/Zeebrow/define/define.MWThesaurusApiKey=$(MW_THES_API_KEY)' \
 		" \
 		-o build/$(PROG_NAME) $(TGT_FILE) 
 
 build:
+	echo $(VERSION)
+	echo $(GIT_HASH_LONG)
 	go build -ldflags " \
-		-X 'main.Version=$(VERSION)' \
-		-X 'main.BuildDate=$(BUILD_DATE)' \
-		-X 'main.CommitHash=$(GIT_HASH_LONG)' \
-		-X 'main.ProgramName=$(PROG_NAME)' \
+		-X 'github.com/Zeebrow/define/define.Version=$(VERSION)' \
+		-X 'github.com/Zeebrow/define/define.BuildDate=$(BUILD_DATE)' \
+		-X 'github.com/Zeebrow/define/define.CommitHash=$(GIT_HASH_LONG)' \
+		-X 'github.com/Zeebrow/define/define.ProgramName=$(PROG_NAME)' \
 		" \
 		-o build/$(PROG_NAME) $(TGT_FILE) 
 
 
 build-release:
 	go build -ldflags " \
-		-X 'main.Version=$(VERSION)' \
-		-X 'main.BuildDate=$(BUILD_DATE)' \
-		-X 'main.CommitHash=$(GIT_HASH_LONG)' \
-		-X 'main.ProgramName=$(PROG_NAME)' \
+		-X 'github.com/Zeebrow/define/define.Version=$(VERSION)' \
+		-X 'github.com/Zeebrow/define/define.BuildDate=$(BUILD_DATE)' \
+		-X 'github.com/Zeebrow/define/define.CommitHash=$(GIT_HASH_LONG)' \
+		-X 'github.com/Zeebrow/define/define.ProgramName=$(PROG_NAME)' \
 		" \
 		-o build/$(PROG_NAME)-$(VERSION) $(TGT_FILE) 
 
