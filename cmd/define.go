@@ -6,20 +6,18 @@ import (
 	"github.com/Zeebrow/define/define"
 )
 
-var CliArgs define.CliArgs
-
 func main() {
 	// var args = DoArgs()
-	CliArgs.DoArgs()
-	define.GlobalConfig.SetConfig(CliArgs)
-
-	if CliArgs.Dev {
-		define.DevPrintMeanings(CliArgs.Word)
-	} else {
-		mwDictionary := define.NewDictionary(define.GlobalConfig.MWDictionaryApiKey)
-		definitions := mwDictionary.Define(CliArgs.Word).GetSimpleHomonymJSON()
-		definitions.Print()
+	var CliArgs define.CliArgs
+	CliArgs.GetCliArgs()
+	err := define.GlobalConfig.LoadFromFile()
+	if err != nil {
+		panic(err)
 	}
+
+	mwDictionary := define.NewDictionary(define.GlobalConfig.MWDictionaryApiKey)
+	definitions := mwDictionary.Define(CliArgs.Word).GetSimpleHomonymJSON()
+	definitions.Print()
 
 	os.Exit(0)
 }
