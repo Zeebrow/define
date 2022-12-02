@@ -161,13 +161,20 @@ Definitions for '{{.Headword}}':
 }
 
 func (r *DefinitionSet) PrintSuggestions() {
-	outputColumns = 3
-	for n, s := range *r.Suggestions {
-		for i = 0; i < outputColumns; i++ {
-
+	var outputColumns int = 3
+	sugs := *r.Suggestions
+	ct := 0
+	for n := 1; n < 1+len(*r.Suggestions); n += outputColumns {
+		for i := 0; i < outputColumns; i++ {
+			if ct == len(sugs)-1 {
+				fmt.Println()
+				return
+			}
+			fmt.Printf("%d) %s\t", i+n, sugs[i+n])
+			ct++
 		}
+		fmt.Println()
 	}
-	fmt.Println()
 }
 
 /*Parse the raw Merriam-Webster response for the text required to define a word's possible meanings.*/

@@ -19,6 +19,7 @@ func main() {
 	definitions, err := mwDictionary.Lookup(CliArgs.Word)
 	if err != nil {
 		definitions.PrintSuggestions()
+		os.Exit(1)
 	}
 	entries := definitions.GetSimpleHomonymJSON()
 	entries.Print()
