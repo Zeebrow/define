@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/Zeebrow/define/define"
@@ -17,8 +18,10 @@ func main() {
 	mwDictionary := define.NewDictionary(define.GlobalConfig.MWDictionaryApiKey)
 	definitions, err := mwDictionary.Lookup(CliArgs.Word)
 	if err != nil {
+		fmt.Printf("\n%s\n%s\n\n", err, "Consider trying one of these instead!")
 		definitions.PrintSuggestions()
-		os.Exit(1)
+		return
+		// os.Exit(1)
 	}
 	entries := definitions.GetSimpleHomonymJSON()
 	entries.Print()

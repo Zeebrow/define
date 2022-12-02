@@ -161,8 +161,31 @@ Definitions for '{{.Headword}}':
 }
 
 func (r *DefinitionSet) PrintSuggestions() {
+	// termwidth := 80
 	var outputColumns int = 3
-	sugs := *r.Suggestions
+	sugs := *r.Suggestions //create new array and  copy
+
+	/*to make nice columns*/
+	maxSize := 0
+	formattedSugs := make([]string, len(sugs))
+	for _, s := range sugs {
+		if len(s) > maxSize {
+			maxSize = len(s)
+		}
+	}
+	/*need too loop again bc of maxSize change*/
+	for j, s := range sugs {
+		if len(sugs) > 9 && j > 9 { //you can't possibly get >100 suggestions..
+			formattedSugs[j] = s
+		} else {
+			formattedSugs[j] = " " + s
+		}
+		for i := 0; i < maxSize-len(s); i++ {
+			formattedSugs[j] += " "
+		}
+	}
+
+	/*do the printing*/
 	c := 0
 	for n := 1; n < 1+len(*r.Suggestions); n += outputColumns {
 		for i := 0; i < outputColumns; i++ {
@@ -170,7 +193,8 @@ func (r *DefinitionSet) PrintSuggestions() {
 				fmt.Println()
 				return
 			}
-			fmt.Printf("%d) %s\t", i+n, sugs[i+n])
+			// fmt.Printf("%d) %s\t", i+n, sugs[i+n])
+			fmt.Printf("%d) %s\t", i+n, formattedSugs[i+n])
 			c++
 		}
 		fmt.Println()
