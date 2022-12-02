@@ -179,9 +179,6 @@ func (r *DefinitionSet) PrintSuggestions() {
 
 /*Parse the raw Merriam-Webster response for the text required to define a word's possible meanings.*/
 func (r *DefinitionSet) GetSimpleHomonymJSON() SimpleHomonymJSON {
-	if r.Suggestions != nil {
-		// r.Headword was apparently not a word that Merriam-Webster knows about.
-	}
 	var oj SimpleHomonymJSON
 	oj.Headword = r.Headword
 	for i, e := range r.Entries {

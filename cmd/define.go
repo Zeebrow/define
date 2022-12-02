@@ -15,7 +15,6 @@ func main() {
 	}
 
 	mwDictionary := define.NewDictionary(define.GlobalConfig.MWDictionaryApiKey)
-	//@@@ Where am I supposed to ask the user if they are sure what they want to define should be in the dictionary?
 	definitions, err := mwDictionary.Lookup(CliArgs.Word)
 	if err != nil {
 		definitions.PrintSuggestions()
@@ -23,6 +22,5 @@ func main() {
 	}
 	entries := definitions.GetSimpleHomonymJSON()
 	entries.Print()
-
 	os.Exit(0)
 }
