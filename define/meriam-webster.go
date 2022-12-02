@@ -178,10 +178,10 @@ func (r *DefinitionSet) PrintSuggestions() {
 		if len(sugs) > 9 && j > 9 { //you can't possibly get >100 suggestions..
 			formattedSugs[j] = s
 		} else {
-			formattedSugs[j] = " " + s
+			formattedSugs[j] = s + " "
 		}
 		for i := 0; i < maxSize-len(s); i++ {
-			formattedSugs[j] += " "
+			formattedSugs[j] = " " + formattedSugs[j]
 		}
 	}
 
@@ -194,7 +194,8 @@ func (r *DefinitionSet) PrintSuggestions() {
 				return
 			}
 			// fmt.Printf("%d) %s\t", i+n, sugs[i+n])
-			fmt.Printf("%d) %s\t", i+n, formattedSugs[i+n])
+			// fmt.Printf("%d) %s\t", i+n, formattedSugs[i+n])
+			fmt.Printf("%s\t", formattedSugs[i+n])
 			c++
 		}
 		fmt.Println()
