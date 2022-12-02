@@ -163,15 +163,15 @@ Definitions for '{{.Headword}}':
 func (r *DefinitionSet) PrintSuggestions() {
 	var outputColumns int = 3
 	sugs := *r.Suggestions
-	ct := 0
+	c := 0
 	for n := 1; n < 1+len(*r.Suggestions); n += outputColumns {
 		for i := 0; i < outputColumns; i++ {
-			if ct == len(sugs)-1 {
+			if c == len(sugs)-1 {
 				fmt.Println()
 				return
 			}
 			fmt.Printf("%d) %s\t", i+n, sugs[i+n])
-			ct++
+			c++
 		}
 		fmt.Println()
 	}
