@@ -2,6 +2,7 @@ package define
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -50,7 +51,8 @@ type MWMetadata struct {
 	Offensive bool
 }
 
-func (mw *MWRawAPI) Define(headword string) *DefinitionSet { // @@@ maybe the suggestions should be returned as an error
+// @@@ maybe the suggestions should be returned as an error
+func (mw *MWRawAPI) Lookup(headword string) (*DefinitionSet, error) {
 	var ds DefinitionSet = DefinitionSet{}
 	mw.Headword = headword
 	ds.Headword = headword
@@ -73,18 +75,14 @@ func (mw *MWRawAPI) Define(headword string) *DefinitionSet { // @@@ maybe the su
 
 	//err = mw.judge()
 	err = json.Unmarshal(t, &ds.Suggestions)
-	if err != nil {
-		// got good definition
-		err = json.Unmarshal(t, &ds.Entries)
-		if err != nil {
-			panic(err) //crap
-		}
-		return &ds
-	} else {
-		//got suggestions instead
-		ds.Entries = nil
+	if err == nil {
+		return &ds, errors.New("lookup failed for word: " + headword)
 	}
-	panic("bug: could not unmarshal response into suggestions or entries")
+	err = json.Unmarshal(t, &ds.Entries)
+	if err != nil {
+		panic("unexpected response from server: " + err.Error())
+	}
+	return &ds, nil
 }
 
 func (meta *MWMetadata) hom() string {
@@ -162,8 +160,21 @@ Definitions for '{{.Headword}}':
 
 }
 
+func (r *DefinitionSet) PrintSuggestions() {
+	outputColumns = 3
+	for n, s := range *r.Suggestions {
+		for i = 0; i < outputColumns; i++ {
+
+		}
+	}
+	fmt.Println()
+}
+
 /*Parse the raw Merriam-Webster response for the text required to define a word's possible meanings.*/
 func (r *DefinitionSet) GetSimpleHomonymJSON() SimpleHomonymJSON {
+	if r.Suggestions != nil {
+		// r.Headword was apparently not a word that Merriam-Webster knows about.
+	}
 	var oj SimpleHomonymJSON
 	oj.Headword = r.Headword
 	for i, e := range r.Entries {

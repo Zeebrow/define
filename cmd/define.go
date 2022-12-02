@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-	// var args = DoArgs()
 	var CliArgs define.CliArgs
 	CliArgs.GetCliArgs()
 	err := define.GlobalConfig.LoadFromFile()
@@ -16,8 +15,13 @@ func main() {
 	}
 
 	mwDictionary := define.NewDictionary(define.GlobalConfig.MWDictionaryApiKey)
-	definitions := mwDictionary.Define(CliArgs.Word).GetSimpleHomonymJSON()
-	definitions.Print()
+	//@@@ Where am I supposed to ask the user if they are sure what they want to define should be in the dictionary?
+	definitions, err := mwDictionary.Lookup(CliArgs.Word)
+	if err != nil {
+		definitions.PrintSuggestions()
+	}
+	entries := definitions.GetSimpleHomonymJSON()
+	entries.Print()
 
 	os.Exit(0)
 }
