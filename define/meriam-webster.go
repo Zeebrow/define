@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
 	"text/template"
 )
 
@@ -83,37 +82,6 @@ func (mw *MWRawAPI) Lookup(headword string) (*DefinitionSet, error) {
 		panic("unexpected response from server: " + err.Error())
 	}
 	return &ds, nil
-}
-
-func (meta *MWMetadata) hom() string {
-	if strings.Contains(meta.Id, ":") {
-		return strings.Split(meta.Id, ":")[0]
-	}
-	return meta.Id
-}
-
-func (meta *MWMetadata) homNum() string {
-	if strings.Contains(meta.Id, ":") {
-		return strings.Split(meta.Id, ":")[1]
-	}
-	return ""
-}
-
-func (e *Entry) printShortdefs() {
-	// fmt.Printf("\t%s (%s)\n\t%s\n", e.Fl, e.Meta.Id, strings.Repeat("-", len(e.Fl)))
-	var printString string
-	if e.Meta.homNum() != "" {
-		printString = fmt.Sprintf("\t%s (%s - Homonym %s)\n", e.Fl, e.Meta.hom(), e.Meta.homNum())
-	} else {
-		printString = fmt.Sprintf("\t%s (%s)\n", e.Fl, e.Meta.Id)
-	}
-	underline := fmt.Sprintf("\t%s\n", strings.Repeat("-", len(printString)))
-	fmt.Printf("%s", printString)
-	fmt.Printf("%s", underline)
-	for i, v := range e.Shortdef {
-		fmt.Printf("\t(%d/%d)\t%s\n", i+1, len(e.Shortdef), v)
-	}
-	fmt.Println()
 }
 
 type SimpleHomonymJSON struct {
@@ -211,38 +179,4 @@ func (r *DefinitionSet) GetSimpleHomonymJSON() SimpleHomonymJSON {
 		oj.SimpleHomonymGroups = append(oj.SimpleHomonymGroups, *hEntry)
 	}
 	return oj
-}
-
-func (r *DefinitionSet) doForEntries() {
-	var prevWasHomonym bool
-	var currentHasHomonym bool
-	/*group definitions together by homonym, separate by crappy little line*/
-	for n, v := range r.Entries {
-		if n == 0 {
-			prevWasHomonym = true
-		}
-		if v.Meta.homNum() != "" {
-			currentHasHomonym = true
-		} else {
-			currentHasHomonym = false
-		}
-
-		if currentHasHomonym && !prevWasHomonym {
-			prevWasHomonym = true
-			fmt.Println("_________")
-			v.printShortdefs()
-		} else if currentHasHomonym && prevWasHomonym {
-			prevWasHomonym = true
-			v.printShortdefs()
-		} else if !currentHasHomonym && prevWasHomonym {
-			prevWasHomonym = false
-			fmt.Println("_________")
-			v.printShortdefs()
-		} else { //!currentHasHomonym && !prevWasHomonym
-			prevWasHomonym = false
-			fmt.Println("_________")
-			v.printShortdefs()
-		}
-
-	}
 }
