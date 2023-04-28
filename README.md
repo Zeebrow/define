@@ -6,7 +6,7 @@ Stop going to your browser just to get a GOOD definition for a word.
 
 ## Status
 
-Working enough
+[I literally just can't even right now.](https://mholt.github.io/json-to-go/)
 
 ## Usage
 
