@@ -14,16 +14,16 @@ jobs:
       id-token: write
       contents: read
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-region: us-east-1
-        role-to-assume: arn:aws:iam::188154480716:role/github-actions-credentials
+        role-to-assume: arn:aws:iam::{{ secrets.AWS_ACCOUNT }}:role/github-actions-credentials
         role-session-name: gh-action-define
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4
       with:
         go-version: 1.18
     - name: Test install
@@ -43,7 +43,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -51,7 +51,7 @@ jobs:
         role-to-assume: arn:aws:iam::188154480716:role/github-actions-credentials
         role-session-name: gh-action-define
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4
       with:
         go-version: 1.18
 
