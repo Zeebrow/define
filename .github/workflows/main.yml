@@ -20,7 +20,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-region: us-east-1
-        role-to-assume: arn:aws:iam::{{ secrets.AWS_ACCOUNT }}:role/github-actions-credentials
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/github-actions-credentials
         role-session-name: gh-action-define
     - name: Set up Go
       uses: actions/setup-go@v4
