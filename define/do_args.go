@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
 type LambdaConfig struct {
@@ -33,14 +34,13 @@ func (cliargs *CliArgs) GetCliArgs() {
 		fmt.Println(ProgInfo.GetInfo())
 		os.Exit(0)
 	}
+
 	if flag.NArg() < 1 {
 		fmt.Println("Specify a word to look up!")
 		flag.Usage()
 		os.Exit(1)
 	} else if flag.NArg() > 1 {
-		fmt.Printf("one word at a time, please! (You entered %v)\n", flag.Args())
-		flag.Usage()
-		os.Exit(1)
+		cliargs.Word = strings.Join(flag.Args(), " ")
 	} else {
 		cliargs.Word = flag.Arg(0)
 	}
