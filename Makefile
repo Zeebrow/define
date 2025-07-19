@@ -6,7 +6,7 @@ BUILD_DATE := $(shell date -I)
 TGT_FILE := cmd/define.go
 GOARCH := amd64#amd64, 386, arm, ppc64
 GOOS := linux#linux, darwin, windows, netbsd
-DEB_INSTALL_DIR := /usr/local/bin
+DEB_INSTALL_DIR := /usr/bin
 
 
 require_version:
